@@ -1,0 +1,7 @@
+# For more info on HTTP files go to https://aka.ms/vs/httpfile
+@WorkoutTrackerApi_HostAddress = http://localhost:5217;
+
+GET {{WorkoutTrackerApi_HostAddress}}/WorkoutTracker/User/1
+Accept: application/json
+
+###
