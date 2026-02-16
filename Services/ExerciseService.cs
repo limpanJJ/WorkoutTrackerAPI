@@ -1,40 +1,80 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.EntityFrameworkCore;    
+using WorkoutTrackerAPI.Data;
+using WorkoutTrackerAPI.Dtos;
 using WorkoutTrackerAPI.Models;
 
 namespace WorkoutTrackerAPI.Services
 {
-    public class ExerciseService : IExerciseService
+    public class ExerciseService(AppDbContext context) : IExerciseService
     {
 
-        static List<Exercise> exercises = new List<Exercise>
+        public async Task<ExerciseResponse> CreateExerciseAsync(CreateExerciseRequest exercise)
         {
-            new Exercise { Id = 1, Name = "Push-Up", BodyType = "Chest", Category = "Strength", CreatedAt = DateTime.UtcNow },
-            new Exercise { Id = 2, Name = "Squat", BodyType = "Quads", Category = "Strength", CreatedAt = DateTime.UtcNow },
-            new Exercise { Id = 3, Name = "Plank", BodyType = "Core", Category = "Strength", CreatedAt = DateTime.UtcNow }
-        };
-
-        public Task<Exercise> CreateExerciseAsync(Exercise exercise)
-        {
-            throw new NotImplementedException();
+            var newExercise = new Exercise
+            {
+                Name = exercise.Name,
+                BodyType = exercise.BodyType,
+                Category = exercise.Category,
+                CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+            };
+            context.Add(newExercise);
+            await context.SaveChangesAsync();
+            return new ExerciseResponse
+            {
+                Id = newExercise.Id,
+                BodyType = newExercise.BodyType,
+                Category = newExercise.Category
+            };
         }
 
-        public Task<bool> DeleteExerciseAsync(int id)
+        public async Task<bool> DeleteExerciseAsync(int id)
         {
-            throw new NotImplementedException();
+            var exerciseToDelete = await context.Exercises.FindAsync(id);
+            if (exerciseToDelete is null) 
+                return false;
+
+            context.Exercises.Remove(exerciseToDelete);
+            await context.SaveChangesAsync();
+            return true;
         }
 
-        public async Task<Exercise?> GetExerciseByIdAsync(int id)
+        public async Task<List<ExerciseResponse>> GetAllExercisesAsync()
+            => await context.Exercises.Select(e => new ExerciseResponse
+            {
+                Id = e.Id,
+                Name = e.Name,
+                BodyType = e.BodyType,
+                Category = e.Category
+            }).ToListAsync();
+
+        public async Task<ExerciseResponse?> GetExerciseByIdAsync(int id)
         {
-            var result = exercises.FirstOrDefault(e => e.Id == id);
-            return await Task.FromResult(result);
+            var result = await context.Exercises
+                .Where(e => e.Id == id)
+                .Select(e => new ExerciseResponse
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    BodyType = e.BodyType,
+                    Category = e.Category
+                })
+                .FirstOrDefaultAsync();
+            return result;
         }
 
-        public async Task<List<Exercise>> GetAllExercisesAsync()
-            => await Task.FromResult(exercises);
 
-        public Task<bool> UpdateExerciseAsync(int id, Exercise exercise)
+        public async Task<bool> UpdateExerciseAsync(int id, UpdateExerciseRequest exercise)
         {
-            throw new NotImplementedException();
+            var existingCharacter = await context.Exercises.FindAsync(id);
+            if (existingCharacter is null) 
+                return false;
+
+            existingCharacter.Name = exercise.Name;
+            existingCharacter.BodyType = exercise.BodyType;
+            existingCharacter.Category = exercise.Category;
+
+            await context.SaveChangesAsync();
+            return true;
         }
 
     }
