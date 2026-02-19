@@ -137,3 +137,6 @@ _NCrunch*
 
 # GPX test data
 *.gpx
+
+# local secrets
+.env

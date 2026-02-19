@@ -1,9 +1,9 @@
-﻿namespace WorkoutTrackerAPI.Dtos
+namespace WorkoutTrackerAPI.Dtos
 {
-    public class UserResponse
+    public class RegisterResponse
     {
         public string? Id { get; init; }
         public required string Username { get; init; }
         public DateTimeOffset CreatedAtUtc { get; init; }
     }
-}
+}   

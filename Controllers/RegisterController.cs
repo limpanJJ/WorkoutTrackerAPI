@@ -4,17 +4,17 @@ using WorkoutTrackerAPI.Services;
 
 namespace WorkoutTrackerAPI.Controllers;
 
-[Route("api/auth/register")]
+[Route("api/auth/[controller]")]
 [ApiController]
-public class UserRegisterController (IAuthService service) : ControllerBase
+public class RegisterController (IAuthService service) : ControllerBase
 {
     [HttpPost]
     public async Task<ActionResult> Register(RegisterRequest request)
     {
         try
         {
-            var userResponse = await service.RegisterAsync(request);
-            return CreatedAtAction(nameof(Register), new { id = userResponse.Id }, userResponse);
+            var registerResponse = await service.RegisterAsync(request);
+            return CreatedAtAction(nameof(Register), new { id = registerResponse.Id }, registerResponse);
         }
         catch (Exception ex)
         {

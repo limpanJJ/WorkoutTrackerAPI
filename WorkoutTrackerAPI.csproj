@@ -1,12 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>2b94a1af-2f42-429b-a7e8-6b8455a6f924</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+  <PackageReference Include="DotNetEnv" Version="3.1.1" />
+  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
   <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.3" />
   <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
   <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.3" />

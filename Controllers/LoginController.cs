@@ -4,17 +4,17 @@ using WorkoutTrackerAPI.Services;
 
 namespace WorkoutTrackerAPI.Controllers
 {
-    [Route("api/auth/login")]
+    [Route("api/auth/[controller]")]
     [ApiController]
-    public class UserLoginController(IAuthService service) : ControllerBase
+    public class LoginController(IAuthService authService) : ControllerBase
     {
         [HttpPost]
         public async Task<ActionResult> Login(LoginRequest request)
         {
             try
             {
-                var userResponse = await service.LoginAsync(request);
-                return CreatedAtAction(nameof(Login), new { id = userResponse.Id }, userResponse);
+                var loginResponse = await authService.LoginAsync(request);
+                return Ok(loginResponse);
             }
             catch (Exception ex)
             {

@@ -7,12 +7,17 @@ namespace WorkoutTrackerAPI.Services
     public class AuthService : IAuthService
     {
         private readonly UserManager<User> _userManager;
+        private readonly ILogger<AuthService> _logger;
+        private readonly ITokenService _tokenService;
 
-        public AuthService(UserManager<User> userManager)
+        public AuthService(UserManager<User> userManager, ILogger<AuthService> logger, ITokenService tokenService)
         {
             _userManager = userManager;
+            _logger = logger;
+            _tokenService = tokenService;
         }
-        public async Task<UserResponse> RegisterAsync(RegisterRequest request)
+
+        public async Task<RegisterResponse> RegisterAsync(RegisterRequest request)
         {
             var user = new User
             {
@@ -24,39 +29,44 @@ namespace WorkoutTrackerAPI.Services
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                _logger.LogWarning("Registration failed for {Email}: {Errors}", request.Email, errors);
                 throw new InvalidOperationException(errors);
             }
-            return new UserResponse
+            _logger.LogInformation("User registered successfully: {UserId}", user.Id);
+            return new RegisterResponse
             {
                 Id = user.Id,
                 Username = user.UserName,
                 CreatedAtUtc = user.CreatedAtUtc
             };
         }
-        public async Task<UserResponse> LoginAsync(LoginRequest request)
+
+        public async Task<LoginResponse> LoginAsync(LoginRequest request)
         {
-            // Verify user's Email
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user is null)
             {
+                _logger.LogWarning("Login attempt with non-existent email: {Email}", request.Email);
                 throw new UnauthorizedAccessException("Invalid email or password.");
             }
 
-            // Verify user's Password
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
             if (!isPasswordValid)
             {
-                throw new InvalidOperationException("Invalid email or password.");
+                _logger.LogWarning("Login attempt with invalid password for user: {UserId}", user.Id);
+                throw new UnauthorizedAccessException("Invalid email or password.");
             }
 
-            return new UserResponse
+            _logger.LogInformation("User logged in successfully: {UserId}", user.Id);
+
+            var token = _tokenService.GenerateToken(user);
+
+            return new LoginResponse
             {
                 Id = user.Id,
                 Username = user.UserName!,
-                CreatedAtUtc = user.CreatedAtUtc
+                Token = token
             };
         }
-
     }
-
 }
