@@ -23,13 +23,36 @@ namespace WorkoutTrackerAPI.Services
             var result = await _userManager.CreateAsync(user, request.Password);
             if (!result.Succeeded)
             {
-                var errors = result.Errors.Select(e => e.Description).ToList();
-                // returnera errors, eller kasta exception med dem
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new InvalidOperationException(errors);
             }
             return new UserResponse
             {
                 Id = user.Id,
                 Username = user.UserName,
+                CreatedAtUtc = user.CreatedAtUtc
+            };
+        }
+        public async Task<UserResponse> LoginAsync(LoginRequest request)
+        {
+            // Verify user's Email
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user is null)
+            {
+                throw new UnauthorizedAccessException("Invalid email or password.");
+            }
+
+            // Verify user's Password
+            var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
+            if (!isPasswordValid)
+            {
+                throw new InvalidOperationException("Invalid email or password.");
+            }
+
+            return new UserResponse
+            {
+                Id = user.Id,
+                Username = user.UserName!,
                 CreatedAtUtc = user.CreatedAtUtc
             };
         }
