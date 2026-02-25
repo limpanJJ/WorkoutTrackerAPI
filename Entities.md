@@ -21,7 +21,7 @@
 
 - Id (Guid, PK)
 - Name (string, unique) - "Bench Press", "Squat", etc
-- BodyType (enum: Abs, Back, Chest, Legs, Shoulders)
+- BodyType (enum: Abs, Back, Chest, Quads, Hamstrings, Glutes, Shoulders) only if Strength
 - Category (enum: Strength, Cardio, Flexibility)
 - CreatedAt (DateTime)
 

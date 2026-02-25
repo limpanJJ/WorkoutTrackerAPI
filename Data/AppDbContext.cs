@@ -9,6 +9,7 @@ namespace WorkoutTrackerAPI.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<Exercise> Exercises => Set<Exercise>();
-
+        public DbSet<ExerciseCategory> ExerciseCategories => Set<ExerciseCategory>();
+        public DbSet<MuscleGroup> MuscleGroups => Set<MuscleGroup>();
     }
 }

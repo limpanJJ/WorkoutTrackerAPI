@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WorkoutTrackerAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class ExerciseUpdate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -52,19 +52,29 @@ namespace WorkoutTrackerAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Exercises",
+                name: "ExerciseCategories",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BodyType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateOnly>(type: "date", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Exercises", x => x.Id);
+                    table.PrimaryKey("PK_ExerciseCategories", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MuscleGroups",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MuscleGroups", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -173,6 +183,32 @@ namespace WorkoutTrackerAPI.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Exercises",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
+                    MuscleGroupId = table.Column<int>(type: "int", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Exercises", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Exercises_ExerciseCategories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "ExerciseCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Exercises_MuscleGroups_MuscleGroupId",
+                        column: x => x.MuscleGroupId,
+                        principalTable: "MuscleGroups",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -211,6 +247,16 @@ namespace WorkoutTrackerAPI.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Exercises_CategoryId",
+                table: "Exercises",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Exercises_MuscleGroupId",
+                table: "Exercises",
+                column: "MuscleGroupId");
         }
 
         /// <inheritdoc />
@@ -239,6 +285,12 @@ namespace WorkoutTrackerAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "ExerciseCategories");
+
+            migrationBuilder.DropTable(
+                name: "MuscleGroups");
         }
     }
 }

@@ -12,8 +12,8 @@ using WorkoutTrackerAPI.Data;
 namespace WorkoutTrackerAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260217160155_Initial")]
-    partial class Initial
+    [Migration("20260225011702_ExerciseUpdate")]
+    partial class ExerciseUpdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -160,22 +160,18 @@ namespace WorkoutTrackerAPI.Migrations
 
             modelBuilder.Entity("WorkoutTrackerAPI.Models.Exercise", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("BodyType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateOnly>("CreatedAt")
-                        .HasColumnType("date");
+                    b.Property<int?>("MuscleGroupId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -183,7 +179,45 @@ namespace WorkoutTrackerAPI.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("MuscleGroupId");
+
                     b.ToTable("Exercises");
+                });
+
+            modelBuilder.Entity("WorkoutTrackerAPI.Models.ExerciseCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ExerciseCategories");
+                });
+
+            modelBuilder.Entity("WorkoutTrackerAPI.Models.MuscleGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MuscleGroups");
                 });
 
             modelBuilder.Entity("WorkoutTrackerAPI.Models.User", b =>
@@ -303,6 +337,33 @@ namespace WorkoutTrackerAPI.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("WorkoutTrackerAPI.Models.Exercise", b =>
+                {
+                    b.HasOne("WorkoutTrackerAPI.Models.ExerciseCategory", "Category")
+                        .WithMany("Exercises")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WorkoutTrackerAPI.Models.MuscleGroup", "MuscleGroup")
+                        .WithMany("Exercises")
+                        .HasForeignKey("MuscleGroupId");
+
+                    b.Navigation("Category");
+
+                    b.Navigation("MuscleGroup");
+                });
+
+            modelBuilder.Entity("WorkoutTrackerAPI.Models.ExerciseCategory", b =>
+                {
+                    b.Navigation("Exercises");
+                });
+
+            modelBuilder.Entity("WorkoutTrackerAPI.Models.MuscleGroup", b =>
+                {
+                    b.Navigation("Exercises");
                 });
 #pragma warning restore 612, 618
         }

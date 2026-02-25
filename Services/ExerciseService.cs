@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;    
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using WorkoutTrackerAPI.Data;
 using WorkoutTrackerAPI.Dtos;
 using WorkoutTrackerAPI.Models;
@@ -7,31 +8,35 @@ namespace WorkoutTrackerAPI.Services
 {
     public class ExerciseService(AppDbContext context) : IExerciseService
     {
-
-        public async Task<ExerciseResponse> CreateExerciseAsync(CreateExerciseRequest exercise)
+        public async Task<ExerciseResponse> CreateExerciseAsync(CreateExerciseRequest request)
         {
             var newExercise = new Exercise
             {
-                Name = exercise.Name,
-                BodyType = exercise.BodyType,
-                Category = exercise.Category,
-                CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+                Name = request.Name,
+                CategoryId = request.CategoryId,
+                MuscleGroupId = request.MuscleGroupId,
+                CreatedAt = DateTime.UtcNow
             };
-            context.Add(newExercise);
+
+            context.Exercises.Add(newExercise);
             await context.SaveChangesAsync();
-            return new ExerciseResponse
+
+            await context.Entry(newExercise).Reference(e => e.Category).LoadAsync();
+            if (newExercise.MuscleGroupId.HasValue)
             {
-                Id = newExercise.Id,
-                BodyType = newExercise.BodyType,
-                Category = newExercise.Category
-            };
+                await context.Entry(newExercise).Reference(e => e.MuscleGroup).LoadAsync();
+            }
+
+            return MapToResponse(newExercise);
         }
 
-        public async Task<bool> DeleteExerciseAsync(int id)
+        public async Task<bool> DeleteExerciseAsync(Guid id)
         {
             var exerciseToDelete = await context.Exercises.FindAsync(id);
-            if (exerciseToDelete is null) 
+            if (exerciseToDelete is null)
+            {
                 return false;
+            }
 
             context.Exercises.Remove(exerciseToDelete);
             await context.SaveChangesAsync();
@@ -39,43 +44,67 @@ namespace WorkoutTrackerAPI.Services
         }
 
         public async Task<List<ExerciseResponse>> GetAllExercisesAsync()
-            => await context.Exercises.Select(e => new ExerciseResponse
-            {
-                Id = e.Id,
-                Name = e.Name,
-                BodyType = e.BodyType,
-                Category = e.Category
-            }).ToListAsync();
+            => await context.Exercises
+                .AsNoTracking()
+                .Include(e => e.Category)
+                .Include(e => e.MuscleGroup)
+                .OrderBy(e => e.Name)
+                .Select(e => new ExerciseResponse
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    CategoryId = e.CategoryId,
+                    CategoryName = e.Category.Name,
+                    MuscleGroupId = e.MuscleGroupId,
+                    MuscleGroupName = e.MuscleGroup != null ? e.MuscleGroup.Name : null,
+                    CreatedAt = e.CreatedAt
+                })
+                .ToListAsync();
 
-        public async Task<ExerciseResponse?> GetExerciseByIdAsync(int id)
-        {
-            var result = await context.Exercises
+        public async Task<ExerciseResponse?> GetExerciseByIdAsync(Guid id)
+            => await context.Exercises
+                .AsNoTracking()
+                .Include(e => e.Category)
+                .Include(e => e.MuscleGroup)
                 .Where(e => e.Id == id)
                 .Select(e => new ExerciseResponse
                 {
                     Id = e.Id,
                     Name = e.Name,
-                    BodyType = e.BodyType,
-                    Category = e.Category
+                    CategoryId = e.CategoryId,
+                    CategoryName = e.Category.Name,
+                    MuscleGroupId = e.MuscleGroupId,
+                    MuscleGroupName = e.MuscleGroup != null ? e.MuscleGroup.Name : null,
+                    CreatedAt = e.CreatedAt
                 })
                 .FirstOrDefaultAsync();
-            return result;
-        }
 
-
-        public async Task<bool> UpdateExerciseAsync(int id, UpdateExerciseRequest exercise)
+        public async Task<bool> UpdateExerciseAsync(Guid id, UpdateExerciseRequest request)
         {
-            var existingCharacter = await context.Exercises.FindAsync(id);
-            if (existingCharacter is null) 
+            var existingExercise = await context.Exercises.FindAsync(id);
+            if (existingExercise is null)
+            {
                 return false;
+            }
 
-            existingCharacter.Name = exercise.Name;
-            existingCharacter.BodyType = exercise.BodyType;
-            existingCharacter.Category = exercise.Category;
+            existingExercise.Name = request.Name;
+            existingExercise.CategoryId = request.CategoryId;
+            existingExercise.MuscleGroupId = request.MuscleGroupId;
 
             await context.SaveChangesAsync();
             return true;
         }
 
+        private static ExerciseResponse MapToResponse(Exercise exercise)
+            => new()
+            {
+                Id = exercise.Id,
+                Name = exercise.Name,
+                CategoryId = exercise.CategoryId,
+                CategoryName = exercise.Category.Name,
+                MuscleGroupId = exercise.MuscleGroupId,
+                MuscleGroupName = exercise.MuscleGroup?.Name,
+                CreatedAt = exercise.CreatedAt
+            };
     }
 }
