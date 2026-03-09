@@ -1,4 +1,4 @@
-﻿namespace WorkoutTrackerAPI.Dtos
+﻿namespace WorkoutTrackerAPI.Dtos.Auth
 {
     public class RegisterRequest
     {

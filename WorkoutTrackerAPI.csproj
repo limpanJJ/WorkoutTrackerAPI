@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Dtos\Exercises\MuscleGroups\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
 

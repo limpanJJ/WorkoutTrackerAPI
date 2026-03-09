@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WorkoutTrackerAPI.Services;
-using WorkoutTrackerAPI.Dtos;
+using WorkoutTrackerAPI.Routes;
+using WorkoutTrackerAPI.Dtos.Exercises;
 
 namespace WorkoutTrackerAPI.Controllers;
 
-[Route("api/[controller]")]
+[Route(ApiRoutes.Exercises.Base)]
 [ApiController]
 public class ExerciseController(IExerciseService service) : ControllerBase
 {

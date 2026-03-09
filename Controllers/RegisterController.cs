@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WorkoutTrackerAPI.Dtos;
+using WorkoutTrackerAPI.Dtos.Auth;
+using WorkoutTrackerAPI.Routes;
 using WorkoutTrackerAPI.Services;
 
 namespace WorkoutTrackerAPI.Controllers;
 
-[Route("api/auth/[controller]")]
+[Route(ApiRoutes.Register.Base)]
 [ApiController]
 public class RegisterController (IAuthService service) : ControllerBase
 {

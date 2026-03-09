@@ -11,6 +11,9 @@ namespace WorkoutTrackerAPI.Data
         public DbSet<Exercise> Exercises => Set<Exercise>();
         public DbSet<ExerciseCategory> ExerciseCategories => Set<ExerciseCategory>();
         public DbSet<MuscleGroup> MuscleGroups => Set<MuscleGroup>();
+        public DbSet<WorkoutSession> WorkoutSessions => Set<WorkoutSession>();
+        public DbSet<SessionExercise> SessionExercises => Set<SessionExercise>();
+        public DbSet<ExerciseSet> ExerciseSets => Set<ExerciseSet>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

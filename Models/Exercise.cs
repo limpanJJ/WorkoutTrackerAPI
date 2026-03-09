@@ -2,6 +2,10 @@
 
 namespace WorkoutTrackerAPI.Models
 {
+    /// <summary>
+    /// A reusable exercise template defining name, category, and muscle group.
+    /// Not tied to any specific session — see <see cref="SessionExercise"/> for session-specific usage.
+    /// </summary>
     public class Exercise
     {
 

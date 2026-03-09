@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using WorkoutTrackerAPI.Dtos;
+using WorkoutTrackerAPI.Dtos.Auth;
 using WorkoutTrackerAPI.Models;
 
 namespace WorkoutTrackerAPI.Services

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WorkoutTrackerAPI.Dtos
+namespace WorkoutTrackerAPI.Dtos.Exercises
 {
     public class UpdateExerciseRequest
     {
