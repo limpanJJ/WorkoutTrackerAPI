@@ -1,4 +1,4 @@
-namespace WorkoutTrackerAPI.Dtos.Auth
+namespace WorkoutTrackerAPI.Dtos.Auth.Responses
 {
     public class LoginResponse
     {

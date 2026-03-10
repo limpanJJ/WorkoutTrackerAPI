@@ -1,5 +1,6 @@
 ﻿using System;
-using WorkoutTrackerAPI.Dtos.Exercises;
+using WorkoutTrackerAPI.Dtos.Exercises.Requests;
+using WorkoutTrackerAPI.Dtos.Exercises.Responses;
 
 namespace WorkoutTrackerAPI.Services
 {

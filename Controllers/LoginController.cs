@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WorkoutTrackerAPI.Dtos.Auth;
+using WorkoutTrackerAPI.Dtos.Auth.Requests;
 using WorkoutTrackerAPI.Routes;
 using WorkoutTrackerAPI.Services;
 

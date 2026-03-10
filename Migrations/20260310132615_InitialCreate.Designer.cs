@@ -12,8 +12,8 @@ using WorkoutTrackerAPI.Data;
 namespace WorkoutTrackerAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260225011702_ExerciseUpdate")]
-    partial class ExerciseUpdate
+    [Migration("20260310132615_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -201,6 +201,23 @@ namespace WorkoutTrackerAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ExerciseCategories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Strength"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Cardio"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Mobility"
+                        });
                 });
 
             modelBuilder.Entity("WorkoutTrackerAPI.Models.MuscleGroup", b =>
@@ -218,6 +235,43 @@ namespace WorkoutTrackerAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("MuscleGroups");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Abs"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Back"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Chest"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Glutes"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Hamstrings"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Quads"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Shoulders"
+                        });
                 });
 
             modelBuilder.Entity("WorkoutTrackerAPI.Models.User", b =>
@@ -288,6 +342,102 @@ namespace WorkoutTrackerAPI.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("WorkoutTrackerAPI.Models.WorkoutExercise", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ExerciseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("WorkoutSessionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExerciseId");
+
+                    b.HasIndex("WorkoutSessionId");
+
+                    b.ToTable("WorkoutExercises");
+                });
+
+            modelBuilder.Entity("WorkoutTrackerAPI.Models.WorkoutExerciseSet", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("DistanceMeters")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("DurationSeconds")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Reps")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SetNumber")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("Weight")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("WorkoutExerciseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WorkoutExerciseId");
+
+                    b.ToTable("WorkoutExerciseSets");
+                });
+
+            modelBuilder.Entity("WorkoutTrackerAPI.Models.WorkoutSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("EndedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("WorkoutSessions");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -356,6 +506,47 @@ namespace WorkoutTrackerAPI.Migrations
                     b.Navigation("MuscleGroup");
                 });
 
+            modelBuilder.Entity("WorkoutTrackerAPI.Models.WorkoutExercise", b =>
+                {
+                    b.HasOne("WorkoutTrackerAPI.Models.Exercise", "Exercise")
+                        .WithMany()
+                        .HasForeignKey("ExerciseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WorkoutTrackerAPI.Models.WorkoutSession", "WorkoutSession")
+                        .WithMany("WorkoutExercises")
+                        .HasForeignKey("WorkoutSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Exercise");
+
+                    b.Navigation("WorkoutSession");
+                });
+
+            modelBuilder.Entity("WorkoutTrackerAPI.Models.WorkoutExerciseSet", b =>
+                {
+                    b.HasOne("WorkoutTrackerAPI.Models.WorkoutExercise", "WorkoutExercise")
+                        .WithMany("WorkoutExerciseSets")
+                        .HasForeignKey("WorkoutExerciseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WorkoutExercise");
+                });
+
+            modelBuilder.Entity("WorkoutTrackerAPI.Models.WorkoutSession", b =>
+                {
+                    b.HasOne("WorkoutTrackerAPI.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("WorkoutTrackerAPI.Models.ExerciseCategory", b =>
                 {
                     b.Navigation("Exercises");
@@ -364,6 +555,16 @@ namespace WorkoutTrackerAPI.Migrations
             modelBuilder.Entity("WorkoutTrackerAPI.Models.MuscleGroup", b =>
                 {
                     b.Navigation("Exercises");
+                });
+
+            modelBuilder.Entity("WorkoutTrackerAPI.Models.WorkoutExercise", b =>
+                {
+                    b.Navigation("WorkoutExerciseSets");
+                });
+
+            modelBuilder.Entity("WorkoutTrackerAPI.Models.WorkoutSession", b =>
+                {
+                    b.Navigation("WorkoutExercises");
                 });
 #pragma warning restore 612, 618
         }

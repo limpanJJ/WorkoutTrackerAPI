@@ -2,7 +2,7 @@ namespace WorkoutTrackerAPI.Models;
 
 /// <summary>
 /// Represents a workout session for a <see cref="User"/>,
-/// containing one or more <see cref="SessionExercise"/> entries each with their <see cref="ExerciseSet"/>s.
+/// containing one or more <see cref="WorkoutExercise"/> entries each with their <see cref="WorkoutExerciseSet"/>s.
 /// </summary>
 public class WorkoutSession
 {
@@ -11,9 +11,12 @@ public class WorkoutSession
     public string UserId { get; set; } = string.Empty;
     public User User { get; set; } = null!;
 
+    public string Name { get; set; } = string.Empty;
+
     public DateTime StartedAt { get; set; }
     public DateTime? EndedAt { get; set; }
     public string? Notes { get; set; }
 
-    public ICollection<SessionExercise> SessionExercises { get; set; } = new List<SessionExercise>();
+    public ICollection<WorkoutExercise> WorkoutExercises { get; set; } = new List<WorkoutExercise>();
 }
+        

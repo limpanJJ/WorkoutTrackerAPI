@@ -12,12 +12,20 @@ namespace WorkoutTrackerAPI.Data
         public DbSet<ExerciseCategory> ExerciseCategories => Set<ExerciseCategory>();
         public DbSet<MuscleGroup> MuscleGroups => Set<MuscleGroup>();
         public DbSet<WorkoutSession> WorkoutSessions => Set<WorkoutSession>();
-        public DbSet<SessionExercise> SessionExercises => Set<SessionExercise>();
-        public DbSet<ExerciseSet> ExerciseSets => Set<ExerciseSet>();
+        public DbSet<WorkoutExercise> WorkoutExercises => Set<WorkoutExercise>();
+        public DbSet<WorkoutExerciseSet> WorkoutExerciseSets => Set<WorkoutExerciseSet>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<WorkoutExerciseSet>()
+                .Property(x => x.Weight)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<WorkoutExerciseSet>()
+                .Property(x => x.DistanceMeters)
+                .HasPrecision(18, 2);
 
             modelBuilder.Entity<ExerciseCategory>().HasData(
                 new ExerciseCategory { Id = 1, Name = "Strength" },

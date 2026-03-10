@@ -1,4 +1,4 @@
-namespace WorkoutTrackerAPI.Dtos.Auth
+namespace WorkoutTrackerAPI.Dtos.Auth.Responses
 {
     public class RegisterResponse
     {
@@ -6,4 +6,4 @@ namespace WorkoutTrackerAPI.Dtos.Auth
         public required string Username { get; init; }
         public DateTimeOffset CreatedAtUtc { get; init; }
     }
-}   
+}

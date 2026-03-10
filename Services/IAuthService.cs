@@ -1,4 +1,5 @@
-﻿using WorkoutTrackerAPI.Dtos.Auth;
+﻿using WorkoutTrackerAPI.Dtos.Auth.Requests;
+using WorkoutTrackerAPI.Dtos.Auth.Responses;
 
 namespace WorkoutTrackerAPI.Services
 {

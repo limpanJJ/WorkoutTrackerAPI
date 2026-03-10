@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace WorkoutTrackerAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class ExerciseUpdate : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -184,6 +186,28 @@ namespace WorkoutTrackerAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "WorkoutSessions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkoutSessions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WorkoutSessions_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Exercises",
                 columns: table => new
                 {
@@ -207,6 +231,82 @@ namespace WorkoutTrackerAPI.Migrations
                         column: x => x.MuscleGroupId,
                         principalTable: "MuscleGroups",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WorkoutExercises",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    WorkoutSessionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ExerciseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Order = table.Column<int>(type: "int", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkoutExercises", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WorkoutExercises_Exercises_ExerciseId",
+                        column: x => x.ExerciseId,
+                        principalTable: "Exercises",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_WorkoutExercises_WorkoutSessions_WorkoutSessionId",
+                        column: x => x.WorkoutSessionId,
+                        principalTable: "WorkoutSessions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WorkoutExerciseSets",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    WorkoutExerciseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SetNumber = table.Column<int>(type: "int", nullable: false),
+                    Reps = table.Column<int>(type: "int", nullable: true),
+                    Weight = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    DurationSeconds = table.Column<int>(type: "int", nullable: true),
+                    DistanceMeters = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkoutExerciseSets", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WorkoutExerciseSets_WorkoutExercises_WorkoutExerciseId",
+                        column: x => x.WorkoutExerciseId,
+                        principalTable: "WorkoutExercises",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "ExerciseCategories",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Strength" },
+                    { 2, "Cardio" },
+                    { 3, "Mobility" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "MuscleGroups",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Abs" },
+                    { 2, "Back" },
+                    { 3, "Chest" },
+                    { 4, "Glutes" },
+                    { 5, "Hamstrings" },
+                    { 6, "Quads" },
+                    { 7, "Shoulders" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -257,6 +357,26 @@ namespace WorkoutTrackerAPI.Migrations
                 name: "IX_Exercises_MuscleGroupId",
                 table: "Exercises",
                 column: "MuscleGroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkoutExercises_ExerciseId",
+                table: "WorkoutExercises",
+                column: "ExerciseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkoutExercises_WorkoutSessionId",
+                table: "WorkoutExercises",
+                column: "WorkoutSessionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkoutExerciseSets_WorkoutExerciseId",
+                table: "WorkoutExerciseSets",
+                column: "WorkoutExerciseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkoutSessions_UserId",
+                table: "WorkoutSessions",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -278,19 +398,28 @@ namespace WorkoutTrackerAPI.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Exercises");
+                name: "WorkoutExerciseSets");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "WorkoutExercises");
+
+            migrationBuilder.DropTable(
+                name: "Exercises");
+
+            migrationBuilder.DropTable(
+                name: "WorkoutSessions");
 
             migrationBuilder.DropTable(
                 name: "ExerciseCategories");
 
             migrationBuilder.DropTable(
                 name: "MuscleGroups");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
         }
     }
 }

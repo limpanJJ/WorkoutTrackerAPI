@@ -1,4 +1,4 @@
-﻿namespace WorkoutTrackerAPI.Dtos.Exercises
+namespace WorkoutTrackerAPI.Dtos.Exercises.Requests
 {
     public class CreateExerciseRequest
     {

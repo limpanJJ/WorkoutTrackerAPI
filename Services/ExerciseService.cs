@@ -1,7 +1,8 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using WorkoutTrackerAPI.Data;
-using WorkoutTrackerAPI.Dtos.Exercises;
+using WorkoutTrackerAPI.Dtos.Exercises.Requests;
+using WorkoutTrackerAPI.Dtos.Exercises.Responses;
 using WorkoutTrackerAPI.Models;
 
 namespace WorkoutTrackerAPI.Services

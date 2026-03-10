@@ -4,7 +4,7 @@ namespace WorkoutTrackerAPI.Models;
 /// Represents a specific exercise performed during a <see cref="WorkoutSession"/>.
 /// Uses <see cref="Exercise"/> as a template — the session-specific data (sets, order, notes) lives here.
 /// </summary>
-public class SessionExercise
+public class WorkoutExercise
 {
     public Guid Id { get; set; }
 
@@ -18,5 +18,5 @@ public class SessionExercise
     public string? Notes { get; set; }
     public DateTime CreatedAt { get; set; }
 
-    public ICollection<ExerciseSet> ExerciseSets { get; set; } = new List<ExerciseSet>();
+    public ICollection<WorkoutExerciseSet> WorkoutExerciseSets { get; set; } = new List<WorkoutExerciseSet>();
 }
