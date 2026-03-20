@@ -2,6 +2,10 @@
 {
 	public class CreateExerciseSetRequest
 	{
-		// TODO: Add properties
+		public int SetNumber { get; set; }
+		public int? Reps { get; set; }
+		public decimal? Weight { get; set; }
+		public int? DurationSeconds { get; set; }
+		public decimal? DistanceMeters { get; set; }
 	}
 }
