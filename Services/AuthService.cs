@@ -8,12 +8,18 @@ namespace WorkoutTrackerAPI.Services
     public class AuthService : IAuthService
     {
         private readonly UserManager<User> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<AuthService> _logger;
         private readonly ITokenService _tokenService;
 
-        public AuthService(UserManager<User> userManager, ILogger<AuthService> logger, ITokenService tokenService)
+        public AuthService(
+            UserManager<User> userManager,
+            RoleManager<IdentityRole> roleManager,
+            ILogger<AuthService> logger,
+            ITokenService tokenService)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
             _logger = logger;
             _tokenService = tokenService;
         }
@@ -33,6 +39,13 @@ namespace WorkoutTrackerAPI.Services
                 _logger.LogWarning("Registration failed for {Email}: {Errors}", request.Email, errors);
                 throw new InvalidOperationException(errors);
             }
+
+            // Ensure "User" role exists, then assign it by default
+            if (!await _roleManager.RoleExistsAsync("User"))
+                await _roleManager.CreateAsync(new IdentityRole("User"));
+
+            await _userManager.AddToRoleAsync(user, "User");
+
             _logger.LogInformation("User registered successfully: {UserId}", user.Id);
             return new RegisterResponse
             {
@@ -60,7 +73,8 @@ namespace WorkoutTrackerAPI.Services
 
             _logger.LogInformation("User logged in successfully: {UserId}", user.Id);
 
-            var token = _tokenService.GenerateToken(user);
+            var roles = await _userManager.GetRolesAsync(user);
+            var token = _tokenService.GenerateToken(user, roles);
 
             return new LoginResponse
             {

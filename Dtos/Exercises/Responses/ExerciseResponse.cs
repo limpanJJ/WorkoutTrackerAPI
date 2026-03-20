@@ -8,6 +8,7 @@ namespace WorkoutTrackerAPI.Dtos.Exercises.Responses
         public string CategoryName { get; set; } = string.Empty;
         public int? MuscleGroupId { get; set; }
         public string? MuscleGroupName { get; set; }
+        public bool IsDefault { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

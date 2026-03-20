@@ -4,7 +4,8 @@ namespace WorkoutTrackerAPI.Models
 {
     /// <summary>
     /// A reusable exercise template defining name, category, and muscle group.
-    /// Not tied to any specific session — see <see cref="SessionExercise"/> for session-specific usage.
+    /// When <see cref="UserId"/> is null the exercise is a global default visible to everyone.
+    /// When set, it is a custom exercise owned by that user.
     /// </summary>
     public class Exercise
     {
@@ -17,7 +18,13 @@ namespace WorkoutTrackerAPI.Models
 
         public int? MuscleGroupId { get; set; }
         public MuscleGroup? MuscleGroup { get; set; }
-        
+
+        /// <summary>
+        /// Null = global default exercise. Set = custom exercise owned by this user.
+        /// </summary>
+        public string? UserId { get; set; }
+        public User? User { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
     }

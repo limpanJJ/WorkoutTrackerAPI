@@ -7,6 +7,7 @@ using WorkoutTrackerAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 
 // load .env into environment variables BEFORE CreateBuilder
 if (File.Exists(".env"))
@@ -39,12 +40,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidateAudience = true,
             ValidAudience = builder.Configuration["Jwt:Audience"],
-            ValidateLifetime = true
+            ValidateLifetime = true,
+            RoleClaimType = System.Security.Claims.ClaimTypes.Role
         };
     });
 
 builder.Services
     .AddIdentityCore<User>()
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.AddOpenApi();
@@ -70,7 +73,10 @@ if (app.Environment.IsDevelopment())
     await DbSeeder.SeedAsync(services);
 
     app.MapOpenApi();
-    app.MapScalarApiReference();
+    app.MapScalarApiReference(options =>
+    {
+        //options.AddHttpAuthentication("Bearer", auth => { });
+    });
 }
 
 app.UseHttpsRedirection();

@@ -6,10 +6,10 @@ namespace WorkoutTrackerAPI.Services
 {
     public interface IExerciseService
     {
-        Task<List<ExerciseResponse>> GetAllExercisesAsync();
-        Task<ExerciseResponse?> GetExerciseByIdAsync(Guid id);
-        Task<ExerciseResponse> CreateExerciseAsync(CreateExerciseRequest exercise);
-        Task<bool> UpdateExerciseAsync(Guid id, UpdateExerciseRequest exercise);
-        Task<bool> DeleteExerciseAsync(Guid id);
+        Task<List<ExerciseResponse>> GetAllExercisesAsync(string userId);
+        Task<ExerciseResponse?> GetExerciseByIdAsync(Guid id, string userId);
+        Task<ExerciseResponse> CreateExerciseAsync(CreateExerciseRequest exercise, string userId);
+        Task<bool> UpdateExerciseAsync(Guid id, UpdateExerciseRequest exercise, string userId);
+        Task<bool> DeleteExerciseAsync(Guid id, string userId);
     }
 }

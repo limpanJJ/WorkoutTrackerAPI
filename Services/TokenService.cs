@@ -15,7 +15,7 @@ namespace WorkoutTrackerAPI.Services
             _configuration = configuration;
         }
 
-        public string GenerateToken(User user)
+        public string GenerateToken(User user, IList<string> roles)
         {
             var jwtSecret = _configuration["Jwt:SecretKey"] ?? Environment.GetEnvironmentVariable("Jwt__SecretKey");
             if (string.IsNullOrWhiteSpace(jwtSecret))
@@ -36,12 +36,18 @@ namespace WorkoutTrackerAPI.Services
             var securityKey = new SymmetricSecurityKey(keyBytes);
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-                new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName ?? string.Empty),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty)
+                new(JwtRegisteredClaimNames.Sub, user.Id),
+                new(JwtRegisteredClaimNames.UniqueName, user.UserName ?? string.Empty),
+                new(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty)
             };
+
+            // Add a role claim for each role the user belongs to
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var expiresInMinutes = _configuration.GetValue<int?>("Jwt:ExpirationInMinutes") ?? 60;
 
