@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using WorkoutTrackerAPI.Constants;
 using WorkoutTrackerAPI.Dtos.Auth.Requests;
 using WorkoutTrackerAPI.Dtos.Auth.Responses;
 using WorkoutTrackerAPI.Models;
@@ -40,11 +41,10 @@ namespace WorkoutTrackerAPI.Services
                 throw new InvalidOperationException(errors);
             }
 
-            // Ensure "User" role exists, then assign it by default
-            if (!await _roleManager.RoleExistsAsync("User"))
-                await _roleManager.CreateAsync(new IdentityRole("User"));
+            if (!await _roleManager.RoleExistsAsync(Roles.User))
+                await _roleManager.CreateAsync(new IdentityRole(Roles.User));
 
-            await _userManager.AddToRoleAsync(user, "User");
+            await _userManager.AddToRoleAsync(user, Roles.User);
 
             _logger.LogInformation("User registered successfully: {UserId}", user.Id);
             return new RegisterResponse

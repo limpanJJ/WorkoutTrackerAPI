@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using WorkoutTrackerAPI.Constants;
 using WorkoutTrackerAPI.Models;
 
 namespace WorkoutTrackerAPI.Data;
@@ -14,7 +15,7 @@ public static class DbSeeder
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
         // ---- Seed roles ----
-        string[] roles = ["Admin", "User"];
+        string[] roles = [Roles.Admin, Roles.User];
         foreach (var role in roles)
         {
             if (!await roleManager.RoleExistsAsync(role))
@@ -43,7 +44,7 @@ public static class DbSeeder
             }
             else
             {
-                await userManager.AddToRoleAsync(user, "Admin");
+                await userManager.AddToRoleAsync(user, Roles.Admin);
             }
         }
 

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WorkoutTrackerAPI.Dtos.Auth.Requests;
-using WorkoutTrackerAPI.Dtos.Auth.Responses;
 using WorkoutTrackerAPI.Routes;
 using WorkoutTrackerAPI.Services;
 
@@ -8,7 +7,7 @@ namespace WorkoutTrackerAPI.Controllers;
 
 [Route(ApiRoutes.Register.Base)]
 [ApiController]
-public class RegisterController (IAuthService service) : ControllerBase
+public class RegisterController(IAuthService service) : ControllerBase
 {
     [HttpPost]
     public async Task<ActionResult> Register(RegisterRequest request)
@@ -18,9 +17,9 @@ public class RegisterController (IAuthService service) : ControllerBase
             var registerResponse = await service.RegisterAsync(request);
             return CreatedAtAction(nameof(Register), new { id = registerResponse.Id }, registerResponse);
         }
-        catch (Exception ex)
+        catch (InvalidOperationException ex)
         {
-            return BadRequest(ex.Message);
+            return Conflict(ex.Message);
         }
     }
 }

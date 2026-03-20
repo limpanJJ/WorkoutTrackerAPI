@@ -75,7 +75,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference(options =>
     {
-        //options.AddHttpAuthentication("Bearer", auth => { });
+        options.AddHttpAuthentication("Bearer", auth => { });
     });
 }
 

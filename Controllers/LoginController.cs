@@ -3,24 +3,23 @@ using WorkoutTrackerAPI.Dtos.Auth.Requests;
 using WorkoutTrackerAPI.Routes;
 using WorkoutTrackerAPI.Services;
 
-namespace WorkoutTrackerAPI.Controllers
+namespace WorkoutTrackerAPI.Controllers;
+
+[Route(ApiRoutes.Login.Base)]
+[ApiController]
+public class LoginController(IAuthService authService) : ControllerBase
 {
-    [Route(ApiRoutes.Login.Base)]
-    [ApiController]
-    public class LoginController(IAuthService authService) : ControllerBase
+    [HttpPost]
+    public async Task<ActionResult> Login(LoginRequest request)
     {
-        [HttpPost]
-        public async Task<ActionResult> Login(LoginRequest request)
+        try
         {
-            try
-            {
-                var loginResponse = await authService.LoginAsync(request);
-                return Ok(loginResponse);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var loginResponse = await authService.LoginAsync(request);
+            return Ok(loginResponse);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized("Invalid email or password.");
         }
     }
 }

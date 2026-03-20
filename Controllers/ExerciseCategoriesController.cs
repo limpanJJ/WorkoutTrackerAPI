@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WorkoutTrackerAPI.Constants;
 using WorkoutTrackerAPI.Routes;
 
 namespace WorkoutTrackerAPI.Controllers
@@ -20,21 +21,21 @@ namespace WorkoutTrackerAPI.Controllers
 			throw new NotImplementedException();
 		}
 
-		[Authorize(Roles = "Admin")]
+		[Authorize(Roles = Roles.Admin)]
 		[HttpPost]
 		public IActionResult CreateCategory()
 		{
 			throw new NotImplementedException();
 		}
 
-		[Authorize(Roles = "Admin")]
+		[Authorize(Roles = Roles.Admin)]
 		[HttpPut("{id:int}")]
 		public IActionResult UpdateCategory(int id)
 		{
 			throw new NotImplementedException();
 		}
 
-		[Authorize(Roles = "Admin")]
+		[Authorize(Roles = Roles.Admin)]
 		[HttpDelete("{id:int}")]
 		public IActionResult DeleteCategory(int id)
 		{
