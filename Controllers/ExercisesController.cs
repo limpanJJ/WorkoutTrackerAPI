@@ -18,12 +18,7 @@ public class ExercisesController(IExerciseService service) : ControllerBase
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<ExerciseResponse>> GetExerciseById(Guid id)
-    {
-        var exercise = await service.GetExerciseByIdAsync(id, GetUserId());
-        return exercise is null
-            ? NotFound("Exercise with the given ID was not found.")
-            : Ok(exercise);
-    }
+        => Ok(await service.GetExerciseByIdAsync(id, GetUserId()));
 
     [HttpPost]
     public async Task<ActionResult<ExerciseResponse>> CreateExercise(CreateExerciseRequest request)
@@ -35,15 +30,15 @@ public class ExercisesController(IExerciseService service) : ControllerBase
     [HttpPut("{id:guid}")]
     public async Task<ActionResult> UpdateExercise(Guid id, UpdateExerciseRequest request)
     {
-        var updated = await service.UpdateExerciseAsync(id, request, GetUserId());
-        return updated ? NoContent() : NotFound("Exercise with the given Id was not found.");
+        await service.UpdateExerciseAsync(id, request, GetUserId());
+        return NoContent();
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> DeleteExercise(Guid id)
     {
-        var deleted = await service.DeleteExerciseAsync(id, GetUserId());
-        return deleted ? NoContent() : NotFound("Exercise with the given Id was not found.");
+        await service.DeleteExerciseAsync(id, GetUserId());
+        return NoContent();
     }
 
     private string GetUserId()

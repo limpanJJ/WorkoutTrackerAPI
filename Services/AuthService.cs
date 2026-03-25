@@ -2,6 +2,7 @@
 using WorkoutTrackerAPI.Constants;
 using WorkoutTrackerAPI.Dtos.Auth.Requests;
 using WorkoutTrackerAPI.Dtos.Auth.Responses;
+using WorkoutTrackerAPI.Exceptions;
 using WorkoutTrackerAPI.Models;
 
 namespace WorkoutTrackerAPI.Services
@@ -38,7 +39,7 @@ namespace WorkoutTrackerAPI.Services
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
                 _logger.LogWarning("Registration failed for {Email}: {Errors}", request.Email, errors);
-                throw new InvalidOperationException(errors);
+                throw new ConflictException(errors);
             }
 
             if (!await _roleManager.RoleExistsAsync(Roles.User))

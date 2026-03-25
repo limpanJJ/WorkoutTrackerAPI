@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using WorkoutTrackerAPI.Data;
 using WorkoutTrackerAPI.Dtos.Exercises.Requests;
 using WorkoutTrackerAPI.Dtos.Exercises.Responses;
+using WorkoutTrackerAPI.Exceptions;
 using WorkoutTrackerAPI.Models;
 
 namespace WorkoutTrackerAPI.Services
@@ -32,15 +33,16 @@ namespace WorkoutTrackerAPI.Services
             return MapToResponse(newExercise);
         }
 
-        public async Task<bool> DeleteExerciseAsync(Guid id, string userId)
+        public async Task DeleteExerciseAsync(Guid id, string userId)
         {
-            var exercise = await context.Exercises.FindAsync(id);
-            if (exercise is null || !IsOwnedBy(exercise, userId))
-                return false;
+            var exercise = await context.Exercises.FindAsync(id)
+                ?? throw new NotFoundException($"Exercise with ID {id} was not found.");
+
+            if (!IsOwnedBy(exercise, userId))
+                throw new NotFoundException($"Exercise with ID {id} was not found.");
 
             context.Exercises.Remove(exercise);
             await context.SaveChangesAsync();
-            return true;
         }
 
         public async Task<List<ExerciseResponse>> GetAllExercisesAsync(string userId)
@@ -63,8 +65,9 @@ namespace WorkoutTrackerAPI.Services
                 })
                 .ToListAsync();
 
-        public async Task<ExerciseResponse?> GetExerciseByIdAsync(Guid id, string userId)
-            => await context.Exercises
+        public async Task<ExerciseResponse> GetExerciseByIdAsync(Guid id, string userId)
+        {
+            var exercise = await context.Exercises
                 .AsNoTracking()
                 .Include(e => e.Category)
                 .Include(e => e.MuscleGroup)
@@ -80,20 +83,25 @@ namespace WorkoutTrackerAPI.Services
                     IsDefault = e.UserId == null,
                     CreatedAt = e.CreatedAt
                 })
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync()
+                ?? throw new NotFoundException($"Exercise with ID {id} was not found.");
 
-        public async Task<bool> UpdateExerciseAsync(Guid id, UpdateExerciseRequest request, string userId)
+            return exercise;
+        }
+
+        public async Task UpdateExerciseAsync(Guid id, UpdateExerciseRequest request, string userId)
         {
-            var existingExercise = await context.Exercises.FindAsync(id);
-            if (existingExercise is null || !IsOwnedBy(existingExercise, userId))
-                return false;
+            var existingExercise = await context.Exercises.FindAsync(id)
+                ?? throw new NotFoundException($"Exercise with ID {id} was not found.");
+
+            if (!IsOwnedBy(existingExercise, userId))
+                throw new NotFoundException($"Exercise with ID {id} was not found.");
 
             existingExercise.Name = request.Name;
             existingExercise.CategoryId = request.CategoryId;
             existingExercise.MuscleGroupId = request.MuscleGroupId;
 
             await context.SaveChangesAsync();
-            return true;
         }
 
         private static ExerciseResponse MapToResponse(Exercise exercise)
@@ -109,11 +117,7 @@ namespace WorkoutTrackerAPI.Services
                 CreatedAt = exercise.CreatedAt
             };
 
-        /// <summary>
-        /// Only the owner can modify/delete their custom exercises.
-        /// Default exercises (UserId is null) are not editable through this service.
-        /// </summary>
         private static bool IsOwnedBy(Exercise exercise, string userId)
-            => exercise.UserId is not null && exercise.UserId == userId;
+            => exercise.UserId == userId;
     }
 }
