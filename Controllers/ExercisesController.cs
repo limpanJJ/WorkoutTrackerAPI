@@ -2,16 +2,15 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WorkoutTrackerAPI.Services;
-using WorkoutTrackerAPI.Routes;
 using WorkoutTrackerAPI.Dtos.Exercises.Requests;
 using WorkoutTrackerAPI.Dtos.Exercises.Responses;
 
 namespace WorkoutTrackerAPI.Controllers;
 
-[Route(ApiRoutes.Exercises.Base)]
+[Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class ExerciseController(IExerciseService service) : ControllerBase
+public class ExercisesController(IExerciseService service) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<List<ExerciseResponse>>> GetExercises()
