@@ -48,8 +48,6 @@ namespace WorkoutTrackerAPI.Services
         public async Task<List<ExerciseResponse>> GetAllExercisesAsync(string userId)
             => await context.Exercises
                 .AsNoTracking()
-                .Include(e => e.Category)
-                .Include(e => e.MuscleGroup)
                 .Where(e => e.UserId == null || e.UserId == userId)
                 .OrderBy(e => e.Name)
                 .Select(e => new ExerciseResponse
@@ -69,8 +67,6 @@ namespace WorkoutTrackerAPI.Services
         {
             var exercise = await context.Exercises
                 .AsNoTracking()
-                .Include(e => e.Category)
-                .Include(e => e.MuscleGroup)
                 .Where(e => e.Id == id && (e.UserId == null || e.UserId == userId))
                 .Select(e => new ExerciseResponse
                 {

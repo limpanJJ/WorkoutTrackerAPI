@@ -19,7 +19,15 @@ namespace WorkoutTrackerAPI.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<WorkoutExerciseSet>()
+            modelBuilder.Entity<ExerciseCategory>()
+                .HasIndex(x => x.Name)
+                .IsUnique();
+
+			modelBuilder.Entity<MuscleGroup>()
+	            .HasIndex(x => x.Name)
+	            .IsUnique();
+
+			modelBuilder.Entity<WorkoutExerciseSet>()
                 .Property(x => x.Weight)
                 .HasPrecision(18, 2);
 
