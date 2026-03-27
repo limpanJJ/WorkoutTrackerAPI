@@ -1,7 +1,96 @@
-# For more info on HTTP files go to https://aka.ms/vs/httpfile
-@WorkoutTrackerApi_HostAddress = http://localhost:5217;
+@baseUrl = https://localhost:7103
 
-GET {{WorkoutTrackerApi_HostAddress}}/WorkoutTracker/User/1
-Accept: application/json
+### =====================
+### AUTH
+### =====================
 
-###
+### Register
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "jane.doe@example.com",
+  "password": "JaneDoe123!",
+  "username": "jane.doe"
+}
+
+### Login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "JohnDoe123!"
+}
+
+### =====================
+### EXERCISE CATEGORIES
+### =====================
+
+### Get all categories
+GET {{baseUrl}}/api/exercise-categories
+
+### Get category by ID
+GET {{baseUrl}}/api/exercise-categories/1
+
+### Create category (Admin)
+POST {{baseUrl}}/api/exercise-categories
+Content-Type: application/json
+
+{
+  "name": "Plyometrics"
+}
+
+### Update category (Admin)
+PUT {{baseUrl}}/api/exercise-categories/1
+Content-Type: application/json
+
+{
+  "name": "Strength Training"
+}
+
+### Delete category (Admin)
+DELETE {{baseUrl}}/api/exercise-categories/1
+
+### =====================
+### EXERCISES
+### =====================
+
+### Get all exercises
+GET {{baseUrl}}/api/exercises
+
+### Get exercise by ID 
+GET {{baseUrl}}/api/exercises/82CE0C6E-DB57-48C0-BB73-C853BD8ECA05
+
+### Create exercise
+POST {{baseUrl}}/api/exercises
+Content-Type: application/json
+
+{
+  "name": "Bench Press",
+  "categoryId": 1,
+  "muscleGroupId": 3
+}
+
+### Create exercise (cardio, no muscle group)
+POST {{baseUrl}}/api/exercises
+Content-Type: application/json
+
+{
+  "name": "Jump Rope",
+  "categoryId": 2,
+  "muscleGroupId": null
+}
+
+### Update exercise (replace with real GUID)
+PUT {{baseUrl}}/api/exercises/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "name": "Incline Bench Press",
+  "categoryId": 1,
+  "muscleGroupId": 3
+}
+
+### Delete exercise (replace with real GUID)
+DELETE {{baseUrl}}/api/exercises/00000000-0000-0000-0000-000000000000
