@@ -1,8 +1,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.2.11415.280 d18.0
+VisualStudioVersion = 18.2.11415.280
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkoutTrackerAPI", "WorkoutTrackerAPI.csproj", "{648D8BF8-96E3-04E2-6E9C-2DDAB4DF5E1D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkoutTrackerAPI.Tests", "..\WorkoutTrackerAPI.Tests\WorkoutTrackerAPI.Tests.csproj", "{1FB78D81-94B3-44FA-BB78-740F92CCC836}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,6 +16,10 @@ Global
 		{648D8BF8-96E3-04E2-6E9C-2DDAB4DF5E1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{648D8BF8-96E3-04E2-6E9C-2DDAB4DF5E1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{648D8BF8-96E3-04E2-6E9C-2DDAB4DF5E1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FB78D81-94B3-44FA-BB78-740F92CCC836}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FB78D81-94B3-44FA-BB78-740F92CCC836}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FB78D81-94B3-44FA-BB78-740F92CCC836}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FB78D81-94B3-44FA-BB78-740F92CCC836}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
