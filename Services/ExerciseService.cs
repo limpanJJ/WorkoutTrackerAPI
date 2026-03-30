@@ -58,9 +58,15 @@ namespace WorkoutTrackerAPI.Services
 
 		public async Task DeleteExerciseAsync(Guid id, string userId)
 		{
-			var deleted = await repository.DeleteExerciseAsync(id, userId);
-			if (!deleted)
-				throw new NotFoundException($"Exercise with ID {id} was not found.");
+
+			var exercise = await repository.GetExerciseByIdAsync(id, userId, tracked: true)
+				?? throw new NotFoundException($"Exercise with ID {id} was not found.");
+
+			if (exercise.UserId != userId)
+				throw new UnauthorizedException("You do not have permission to delete this exercise.");
+
+			await repository.DeleteExerciseAsync(exercise);
+
 		}
 
 		private static ExerciseResponse MapToResponse(Exercise exercise)

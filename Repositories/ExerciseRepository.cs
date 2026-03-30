@@ -44,18 +44,10 @@ namespace WorkoutTrackerAPI.Repositories
 
 		public async Task SaveChangesAsync() => await context.SaveChangesAsync();
 
-		public async Task<bool> DeleteExerciseAsync(Guid id, string userId)
+		public async Task DeleteExerciseAsync(Exercise exercise)
 		{
-			var exercise = await context.Exercises
-				.Where(e => e.Id == id && e.UserId == userId)
-				.FirstOrDefaultAsync();
-
-			if (exercise is null)
-				return false;
-
-			context.Exercises.Remove(exercise);
-			await context.SaveChangesAsync();
-			return true;
+				context.Exercises.Remove(exercise);
+				await context.SaveChangesAsync();
 		}
 
 		public async Task<bool> ExistsAsync(string name, string userId)
