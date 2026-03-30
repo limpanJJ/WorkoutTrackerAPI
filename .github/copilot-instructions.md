@@ -24,6 +24,8 @@
 - Entities: User, ExerciseCategory, MuscleGroup, Exercise, WorkoutSession, WorkoutExercise, WorkoutExerciseSet.
 - EF Core migrations manage database schema changes.
 - Seed data is provided for exercise categories and muscle groups.
+- Services contain business logic. Repositories contain data access logic.
+- If an entity does not have a repository, its service may access DbContext directly.
 
 ### Error Handling
 - Never throw built-in .NET exceptions (KeyNotFoundException, InvalidOperationException, etc.) to signal HTTP errors. Always use custom exceptions from the Exceptions folder.
