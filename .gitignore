@@ -140,3 +140,6 @@ _NCrunch*
 
 # local secrets
 .env
+
+# Copilot instructions
+.github/copilot-instructions.md
