@@ -23,17 +23,7 @@ namespace WorkoutTrackerAPI.Tests
 			// Arrange
 			var userId = Guid.NewGuid().ToString();
 			var exerciseId = Guid.NewGuid();
-			var exercise = new Exercise
-			{
-				Id = exerciseId,
-				Name = "Bench Press",
-				CategoryId = 1,
-				Category = new ExerciseCategory { Id = 1, Name = "Strength" },
-				MuscleGroupId = 1,
-				MuscleGroup = new MuscleGroup { Id = 1, Name = "Chest" },
-				UserId = userId,
-				CreatedAt = DateTime.UtcNow
-			};
+			var exercise = CreateStandardBenchPressExercise(exerciseId, userId);
 
 			_exerciseRepository
 				.GetExerciseByIdAsync(exerciseId, userId, false)
@@ -76,6 +66,7 @@ namespace WorkoutTrackerAPI.Tests
 				CategoryId = 1,
 				MuscleGroupId = 1
 			};
+         var exercise = CreateStandardBenchPressExercise(Guid.NewGuid(), userId);
 
 			_exerciseRepository
 				.ExistsAsync(request.Name, userId)
@@ -83,17 +74,8 @@ namespace WorkoutTrackerAPI.Tests
 
 			_exerciseRepository
 				.CreateExerciseAsync(Arg.Any<Exercise>())
-				.Returns(new Exercise
-				{
-					Id = Guid.NewGuid(),
-					Name = "Bench Press",
-					CategoryId = 1,
-					Category = new ExerciseCategory { Id = 1, Name = "Strength" },
-					MuscleGroupId = 1,
-					MuscleGroup = new MuscleGroup { Id = 1, Name = "Chest" },
-					UserId = userId,
-					CreatedAt = DateTime.UtcNow
-				});
+				.Returns(exercise);
+
 			// Act
 			var result = await _sut.CreateExerciseAsync(request, userId);
 
@@ -135,11 +117,11 @@ namespace WorkoutTrackerAPI.Tests
 			var exerciseId = Guid.NewGuid();
 			var userId = Guid.NewGuid().ToString();
 			var request = new UpdateExerciseRequest
-				{
-					Name = "Bench Press",
-					CategoryId = 1,
-					MuscleGroupId = 1,
-				};
+			{
+				Name = "Bench Press",
+				CategoryId = 1,
+				MuscleGroupId = 1,
+			};
 			var exercise = new Exercise
 			{
 				Id = exerciseId,
@@ -162,7 +144,7 @@ namespace WorkoutTrackerAPI.Tests
 			Assert.Equal("Bench Press", exercise.Name);
 			Assert.Equal(1, exercise.CategoryId);
 			Assert.Equal(1, exercise.MuscleGroupId);
-			await _exerciseRepository.Received().SaveChangesAsync();
+			await _exerciseRepository.Received(1).SaveChangesAsync();
 
 		}
 		[Fact]
@@ -225,5 +207,69 @@ namespace WorkoutTrackerAPI.Tests
 			await Assert.ThrowsAsync<UnauthorizedException>(act);
 			await _exerciseRepository.DidNotReceive().SaveChangesAsync();
 		}
+
+		[Fact]
+		public async Task DeleteExerciseAsync_ShouldDeleteExercise_WhenExerciseExists()
+		{
+			// Arrange
+			var exerciseId = Guid.NewGuid();
+			var userId = Guid.NewGuid().ToString();
+			var exercise = CreateStandardBenchPressExercise(exerciseId, userId);
+
+			_exerciseRepository.GetExerciseByIdAsync(exerciseId, userId, true)
+				.Returns(exercise);
+			// Act
+			await _sut.DeleteExerciseAsync(exerciseId, userId);
+
+			// Assert
+			await _exerciseRepository.Received(1).DeleteExerciseAsync(exercise);
+		}
+
+		[Fact]
+		public async Task DeleteExerciseAsync_ShouldThrowNotFoundException_WhenExerciseDoesNotExist()
+		{
+			// Arrange
+			var exerciseId = Guid.NewGuid();
+			var userId = Guid.NewGuid().ToString();
+
+			_exerciseRepository
+				.GetExerciseByIdAsync(Arg.Any<Guid>(), Arg.Any<string>(), true)
+				.Returns((Exercise?)null);
+			// Act
+			var act = () => _sut.DeleteExerciseAsync(exerciseId, userId);
+
+			// Assert
+			await Assert.ThrowsAsync<NotFoundException>(act);
+			await _exerciseRepository.DidNotReceive().DeleteExerciseAsync(Arg.Any<Exercise>());
+		}
+		[Fact]
+		public async Task DeleteExerciseAsync_ShouldThrowUnauthorizedException_WhenUserDoesNotOwnExercise()
+		{
+			// Arrange
+			var exerciseId = Guid.NewGuid();
+			var userId = Guid.NewGuid().ToString();
+			var exercise = CreateStandardBenchPressExercise(exerciseId, Guid.NewGuid().ToString());
+			_exerciseRepository.GetExerciseByIdAsync(exerciseId, userId, true)
+				.Returns(exercise);
+			// Act
+			var act = () => _sut.DeleteExerciseAsync(exerciseId, userId);
+			// Assert
+			await Assert.ThrowsAsync<UnauthorizedException>(act);
+			await _exerciseRepository.DidNotReceive().DeleteExerciseAsync(Arg.Any<Exercise>());
+		}
+
+		private static Exercise CreateStandardBenchPressExercise(Guid exerciseId, string userId)
+			=> new()
+			{
+				Id = exerciseId,
+				Name = "Bench Press",
+				CategoryId = 1,
+				Category = new ExerciseCategory { Id = 1, Name = "Strength" },
+				MuscleGroupId = 1,
+				MuscleGroup = new MuscleGroup { Id = 1, Name = "Chest" },
+				UserId = userId,
+				CreatedAt = DateTime.UtcNow
+			};
+
 	}
 }
