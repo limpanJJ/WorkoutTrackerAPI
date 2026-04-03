@@ -128,6 +128,102 @@ namespace WorkoutTrackerAPI.Tests
 			await _exerciseRepository.DidNotReceive().CreateExerciseAsync(Arg.Any<Exercise>());
 		}
 
+		[Fact]
+		public async Task UpdateExerciseAsync_ShouldUpdateExercise_WhenExerciseExists()
+		{
+			// Arrange
+			var exerciseId = Guid.NewGuid();
+			var userId = Guid.NewGuid().ToString();
+			var request = new UpdateExerciseRequest
+				{
+					Name = "Bench Press",
+					CategoryId = 1,
+					MuscleGroupId = 1,
+				};
+			var exercise = new Exercise
+			{
+				Id = exerciseId,
+				Name = "Chest Press",
+				CategoryId = 2,
+				Category = new ExerciseCategory { Id = 2, Name = "Cardio" },
+				MuscleGroupId = 2,
+				MuscleGroup = new MuscleGroup { Id = 2, Name = "Shoulders" },
+				UserId = userId,
+				CreatedAt = DateTime.UtcNow
+			};
 
+			_exerciseRepository.GetExerciseByIdAsync(exerciseId, userId, true)
+				.Returns(exercise);
+
+			// Act
+			await _sut.UpdateExerciseAsync(exerciseId, request, userId);
+
+			// Assert
+			Assert.Equal("Bench Press", exercise.Name);
+			Assert.Equal(1, exercise.CategoryId);
+			Assert.Equal(1, exercise.MuscleGroupId);
+			await _exerciseRepository.Received().SaveChangesAsync();
+
+		}
+		[Fact]
+		public async Task UpdateExerciseAsync_ShouldThrowNotFoundException_WhenExerciseDoesNotExist()
+		{
+			// Arrange
+			var exerciseId = Guid.NewGuid();
+			var userId = Guid.NewGuid().ToString();
+			var request = new UpdateExerciseRequest
+			{
+				Name = "Bench Press",
+				CategoryId = 1,
+				MuscleGroupId = 1,
+			};
+
+			_exerciseRepository
+				.GetExerciseByIdAsync(Arg.Any<Guid>(), Arg.Any<string>(), true)
+				.Returns((Exercise?)null);
+			// Act
+			var act = () => _sut.UpdateExerciseAsync(exerciseId, request, userId);
+
+			// Assert
+			await Assert.ThrowsAsync<NotFoundException>(act);
+			await _exerciseRepository.DidNotReceive().SaveChangesAsync();
+
+		}
+
+		[Fact]
+		public async Task UpdateExerciseAsync_ShouldThrowUnauthorizedException_WhenUserDoesNotOwnExercise()
+		{
+			// Arrange
+			var exerciseId = Guid.NewGuid();
+			var userId = Guid.NewGuid().ToString();
+			var request = new UpdateExerciseRequest
+			{
+				Name = "Bench Press",
+				CategoryId = 1,
+				MuscleGroupId = 1,
+			};
+
+			var exercise = new Exercise
+			{
+				Id = exerciseId,
+				Name = "Chest Press",
+				CategoryId = 2,
+				Category = new ExerciseCategory { Id = 2, Name = "Cardio" },
+				MuscleGroupId = 2,
+				MuscleGroup = new MuscleGroup { Id = 2, Name = "Shoulders" },
+				UserId = Guid.NewGuid().ToString(),
+				CreatedAt = DateTime.UtcNow
+			};
+
+			_exerciseRepository.GetExerciseByIdAsync(exerciseId, userId, true)
+				.Returns(exercise);
+
+			// Act
+			var act = () => _sut.UpdateExerciseAsync(exerciseId, request, userId);
+
+			// Assert
+			await Assert.ThrowsAsync<UnauthorizedException>(act);
+			await _exerciseRepository.DidNotReceive().SaveChangesAsync();
+		}
 	}
 }
