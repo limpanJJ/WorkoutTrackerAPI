@@ -23,10 +23,10 @@ public sealed class ExceptionHandlingMiddleware(
     {
         var (statusCode, title) = exception switch
         {
-            UnauthorizedException       => (StatusCodes.Status401Unauthorized, "Unauthorized"),
-            ConflictException           => (StatusCodes.Status409Conflict, "Conflict"),
-            NotFoundException           => (StatusCodes.Status404NotFound, "Not Found"),
-            _                           => (StatusCodes.Status500InternalServerError, "Internal Server Error"),
+            UnauthorizedException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
+            ConflictException => (StatusCodes.Status409Conflict, "Conflict"),
+            NotFoundException => (StatusCodes.Status404NotFound, "Not Found"),
+            _ => (StatusCodes.Status500InternalServerError, "Internal Server Error"),
         };
 
         // Always log, but only at Error level for unexpected (5xx) failures

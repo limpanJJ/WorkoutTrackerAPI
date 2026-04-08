@@ -23,11 +23,11 @@ namespace WorkoutTrackerAPI.Data
                 .HasIndex(x => x.Name)
                 .IsUnique();
 
-			modelBuilder.Entity<MuscleGroup>()
-	            .HasIndex(x => x.Name)
-	            .IsUnique();
+            modelBuilder.Entity<MuscleGroup>()
+                .HasIndex(x => x.Name)
+                .IsUnique();
 
-			modelBuilder.Entity<WorkoutExerciseSet>()
+            modelBuilder.Entity<WorkoutExerciseSet>()
                 .Property(x => x.Weight)
                 .HasPrecision(18, 2);
 

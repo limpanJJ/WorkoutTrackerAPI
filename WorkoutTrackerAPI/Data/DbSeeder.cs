@@ -50,14 +50,14 @@ public static class DbSeeder
 
         // ---- Seed demo exercises ----
         const int strengthCategoryId = 1;
-        const int cardioCategoryId   = 2;
+        const int cardioCategoryId = 2;
         const int mobilityCategoryId = 3;
 
-        const int absId    = 1;
-        const int backId   = 2;
-        const int chestId  = 3;
+        const int absId = 1;
+        const int backId = 2;
+        const int chestId = 3;
         const int glutesId = 4;
-        const int quadsId  = 6;
+        const int quadsId = 6;
 
         var demoExercises = new[]
         {

@@ -74,7 +74,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // register token service
 builder.Services.AddScoped<ITokenService, TokenService>();
 
-builder.Services.AddScoped<IAuthService, AuthService>();    
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
 builder.Services.AddScoped<IExerciseService, ExerciseService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();

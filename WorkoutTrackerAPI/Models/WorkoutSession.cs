@@ -19,4 +19,3 @@ public class WorkoutSession
 
     public ICollection<WorkoutExercise> WorkoutExercises { get; set; } = new List<WorkoutExercise>();
 }
-        

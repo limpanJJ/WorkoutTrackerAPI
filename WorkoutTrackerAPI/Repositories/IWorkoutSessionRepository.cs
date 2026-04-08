@@ -1,6 +1,6 @@
 ﻿namespace WorkoutTrackerAPI.Repositories
 {
-	public interface IWorkoutSessionRepository
-	{
-	}
+    public interface IWorkoutSessionRepository
+    {
+    }
 }
