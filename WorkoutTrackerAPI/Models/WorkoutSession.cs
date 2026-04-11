@@ -6,16 +6,16 @@ namespace WorkoutTrackerAPI.Models;
 /// </summary>
 public class WorkoutSession
 {
-    public Guid Id { get; set; }
+	public Guid Id { get; set; }
 
-    public string UserId { get; set; } = string.Empty;
-    public User User { get; set; } = null!;
+	public string UserId { get; set; } = string.Empty;
+	public User User { get; set; } = null!;
 
-    public string Name { get; set; } = string.Empty;
+	public string Name { get; set; } = string.Empty;
 
-    public DateTime StartedAt { get; set; }
-    public DateTime? EndedAt { get; set; }
-    public string? Notes { get; set; }
+	public DateTime StartedAt { get; set; }
+	public DateTime? EndedAt { get; set; }
+	public string? Notes { get; set; }
 
-    public ICollection<WorkoutExercise> WorkoutExercises { get; set; } = new List<WorkoutExercise>();
+	public ICollection<WorkoutExercise> WorkoutExercises { get; set; } = new List<WorkoutExercise>();
 }
