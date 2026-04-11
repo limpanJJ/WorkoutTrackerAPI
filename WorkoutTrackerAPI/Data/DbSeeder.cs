@@ -78,5 +78,114 @@ public static class DbSeeder
         }
 
         await context.SaveChangesAsync();
+
+        // ---- Seed demo workout sessions ----
+        if (await context.WorkoutSessions.AnyAsync(ws => ws.UserId == user.Id))
+            return;
+
+        // Reload exercises from DB so we get stable IDs
+        var pushUp = await context.Exercises.FirstAsync(e => e.Name == "Push-up");
+        var squats = await context.Exercises.FirstAsync(e => e.Name == "Squats");
+        var pullUp = await context.Exercises.FirstAsync(e => e.Name == "Pull-up");
+        var running = await context.Exercises.FirstAsync(e => e.Name == "Outdoor Running");
+        var lunge = await context.Exercises.FirstAsync(e => e.Name == "Runner's Lunge");
+
+        var now = DateTime.UtcNow;
+
+        // Session 1: Strength
+        var session1 = new WorkoutSession
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            Name = "Mixed Upper Body",
+            StartedAt = now.AddDays(-3),
+            EndedAt = now.AddDays(-3).AddMinutes(45),
+            Notes = "Felt week today, but pushed through!",
+            WorkoutExercises = new List<WorkoutExercise>
+           {
+               new()
+               {
+                   Id = Guid.NewGuid(),
+                   ExerciseId = pushUp.Id,
+                   Order = 1,
+                   WorkoutExerciseSets = new List<WorkoutExerciseSet>
+                   {
+                       new() { Id = Guid.NewGuid(), SetNumber = 1, Reps = 10 },
+                       new() { Id = Guid.NewGuid(), SetNumber = 2, Reps = 8 },
+                       new() { Id = Guid.NewGuid(), SetNumber = 3, Reps = 6 }
+                   }
+               },
+               new()
+               {
+                   Id = Guid.NewGuid(),
+                   ExerciseId = squats.Id,
+                   Order = 2,
+                   WorkoutExerciseSets = new List<WorkoutExerciseSet>
+                   {
+                       new() { Id = Guid.NewGuid(), SetNumber = 1, Reps = 12, Weight = 100 },
+                       new() { Id = Guid.NewGuid(), SetNumber = 2, Reps = 12, Weight = 100 },
+                       new() { Id = Guid.NewGuid(), SetNumber = 3, Reps = 12, Weight = 100 }
+                   }
+               },
+               new()
+               {
+                   Id = Guid.NewGuid(),
+                   ExerciseId = pullUp.Id,
+                   Order = 3,
+                   WorkoutExerciseSets = new List<WorkoutExerciseSet>
+                   {
+                       new() { Id = Guid.NewGuid(), SetNumber = 1, Reps = 8 },
+                       new() { Id = Guid.NewGuid(), SetNumber = 2, Reps = 8 },
+                       new() { Id = Guid.NewGuid(), SetNumber = 3, Reps = 8 },
+                       new() { Id = Guid.NewGuid(), SetNumber = 4, Reps = 7 }
+                   }
+               }
+           }
+        };
+
+        // Session 2: Cardio + Mobility
+        var session2 = new WorkoutSession
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            Name = "Relaxed Run",
+            StartedAt = now.AddDays(-1),
+            EndedAt = now.AddDays(-1).AddHours(1).AddMinutes(30),
+            WorkoutExercises = new List<WorkoutExercise>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    ExerciseId = lunge.Id,
+                    Order = 1,
+                    WorkoutExerciseSets = new List<WorkoutExerciseSet>
+                    {
+                        new() { Id = Guid.NewGuid(), SetNumber = 1, Reps = 10 },
+                        new() { Id = Guid.NewGuid(), SetNumber = 2, Reps = 10 },
+                        new() { Id = Guid.NewGuid(), SetNumber = 3, Reps = 10 }
+                    }
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    ExerciseId = running.Id,
+                    Order = 2,
+                    WorkoutExerciseSets = new List<WorkoutExerciseSet>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            SetNumber = 1,
+                            DurationSeconds = 3738,
+                            DistanceMeters = 10000
+                        }
+                    }
+                }
+            },
+        };
+
+        context.WorkoutSessions.AddRange(session1, session2);
+        await context.SaveChangesAsync();
+
     }
 }
