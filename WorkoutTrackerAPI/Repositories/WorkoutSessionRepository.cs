@@ -1,6 +1,6 @@
 ﻿namespace WorkoutTrackerAPI.Repositories
 {
-	public class WorkoutSessionRepository
-	{
-	}
+    public class WorkoutSessionRepository
+    {
+    }
 }
