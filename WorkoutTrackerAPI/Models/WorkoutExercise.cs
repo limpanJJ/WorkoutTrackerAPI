@@ -16,7 +16,6 @@ public class WorkoutExercise
 
     public int Order { get; set; }
     public string? Notes { get; set; }
-    public DateTime CreatedAt { get; set; }
 
     public ICollection<WorkoutExerciseSet> WorkoutExerciseSets { get; set; } = new List<WorkoutExerciseSet>();
 }

@@ -10,7 +10,6 @@ namespace WorkoutTrackerAPI.Dtos.Sessions.WorkoutExercises.Responses
         public string ExerciseName { get; set; } = string.Empty;
         public int Order { get; set; }
         public string? Notes { get; set; }
-        public DateTime CreatedAt { get; set; }
         public List<ExerciseSetResponse> Sets { get; set; } = [];
     }
 }

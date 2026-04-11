@@ -47,7 +47,6 @@ Seeded: Abs (1), Back (2), Chest (3), Glutes (4), Hamstrings (5), Quads (6), Sho
 - ExerciseId (Guid, FK → Exercise)
 - Order (int) — position in session
 - Notes (string?, nullable)
-- CreatedAt (DateTime)
 
 ### WorkoutExerciseSet
 
@@ -58,7 +57,6 @@ Seeded: Abs (1), Back (2), Chest (3), Glutes (4), Hamstrings (5), Quads (6), Sho
 - Weight (decimal?, nullable) — kg, precision(18,2)
 - DurationSeconds (int?, nullable) — for planks, cardio
 - DistanceMeters (decimal?, nullable) — for running, precision(18,2)
-- CreatedAt (DateTime)
 
 ## Relationships
 

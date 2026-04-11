@@ -16,5 +16,4 @@ public class WorkoutExerciseSet
     public decimal? Weight { get; set; }
     public int? DurationSeconds { get; set; }
     public decimal? DistanceMeters { get; set; }
-    public DateTime CreatedAt { get; set; }
 }
