@@ -1,7 +1,11 @@
 ﻿using WorkoutTrackerAPI.Dtos.Sessions.WorkoutExercises.Requests;
+using WorkoutTrackerAPI.Dtos.Sessions.WorkoutExercises.Responses;
 using WorkoutTrackerAPI.Dtos.Sessions.WorkoutExerciseSets.Requests;
+using WorkoutTrackerAPI.Dtos.Sessions.WorkoutExerciseSets.Responses;
 using WorkoutTrackerAPI.Dtos.Sessions.Workouts.Requests;
 using WorkoutTrackerAPI.Dtos.Sessions.Workouts.Responses;
+using WorkoutTrackerAPI.Exceptions;
+using WorkoutTrackerAPI.Models;
 using WorkoutTrackerAPI.Repositories;
 
 namespace WorkoutTrackerAPI.Services
@@ -12,8 +16,13 @@ namespace WorkoutTrackerAPI.Services
         public Task<List<WorkoutSessionSummaryResponse>> GetAllWorkoutSessionsAsync(string userId)
             => throw new NotImplementedException();
 
-        public Task<WorkoutSessionResponse> GetWorkoutSessionByIdAsync(Guid id, string userId)
-            => throw new NotImplementedException();
+        public async Task<WorkoutSessionResponse> GetWorkoutSessionByIdAsync(Guid id, string userId)
+        {
+            var session = await repository.GetWorkoutByIdAsync(id, userId)
+                ?? throw new NotFoundException($"Workout session with ID '{id}' not found.");
+
+            return MapToResponse(session);
+        }
 
         public Task<WorkoutSessionResponse> CreateWorkoutSessionAsync(CreateWorkoutSessionRequest request, string userId)
             => throw new NotImplementedException();
@@ -43,5 +52,44 @@ namespace WorkoutTrackerAPI.Services
 
         public Task DeleteExerciseSetAsync(Guid workoutSessionId, Guid exerciseId, Guid setId, string userId)
             => throw new NotImplementedException();
+
+        // Mapping helpers
+        private static WorkoutSessionResponse MapToResponse(WorkoutSession session) => new()
+        {
+            Id = session.Id,
+            Name = session.Name,
+            StartedAt = session.StartedAt,
+            EndedAt = session.EndedAt,
+            Notes = session.Notes,
+            WorkoutExercises = session.WorkoutExercises.Select(we => new WorkoutExerciseResponse
+            {
+                Id = we.Id,
+                WorkoutSessionId = we.WorkoutSessionId,
+                ExerciseId = we.ExerciseId,
+                ExerciseName = we.Exercise?.Name ?? string.Empty,
+                Order = we.Order,
+                Notes = we.Notes,
+                Sets = we.WorkoutExerciseSets.Select(s => new ExerciseSetResponse
+                {
+                    Id = s.Id,
+                    WorkoutExerciseId = s.WorkoutExerciseId,
+                    SetNumber = s.SetNumber,
+                    Reps = s.Reps,
+                    Weight = s.Weight,
+                    DurationSeconds = s.DurationSeconds,
+                    DistanceMeters = s.DistanceMeters
+                }).ToList()
+            }).ToList()
+        };
+
+        private static WorkoutSessionSummaryResponse MapToSummaryResponse(WorkoutSession session) => new()
+        {
+            Id = session.Id,
+            Name = session.Name,
+            StartedAt = session.StartedAt,
+            EndedAt = session.EndedAt,
+            ExerciseCount = session.WorkoutExercises.Count,
+            TotalSets = session.WorkoutExercises.Sum(we => we.WorkoutExerciseSets.Count)
+        };
     }
 }
