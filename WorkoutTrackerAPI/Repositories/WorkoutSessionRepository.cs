@@ -30,8 +30,13 @@ namespace WorkoutTrackerAPI.Repositories
             return await query.FirstOrDefaultAsync();
         }
 
-        public Task<WorkoutSession> CreateWorkoutAsync(WorkoutSession workoutSession)
-            => throw new NotImplementedException();
+        public async Task<WorkoutSession> CreateWorkoutAsync(WorkoutSession workoutSession)
+        {
+            context.WorkoutSessions.Add(workoutSession);
+            await context.SaveChangesAsync();
+
+            return workoutSession;
+        }
 
         public Task DeleteWorkoutAsync(WorkoutSession workoutSession)
             => throw new NotImplementedException();

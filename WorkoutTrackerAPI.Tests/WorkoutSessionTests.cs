@@ -1,4 +1,7 @@
 ﻿using NSubstitute;
+using WorkoutTrackerAPI.Dtos.Sessions.WorkoutExerciseSets.Requests;
+using WorkoutTrackerAPI.Dtos.Sessions.WorkoutExercises.Requests;
+using WorkoutTrackerAPI.Dtos.Sessions.Workouts.Requests;
 using WorkoutTrackerAPI.Models;
 using WorkoutTrackerAPI.Repositories;
 using WorkoutTrackerAPI.Services;
@@ -14,7 +17,7 @@ namespace WorkoutTrackerAPI.Tests
         {
             _sut = new WorkoutSessionService(_workoutSessionRepository);
         }
-
+        // Test for GetWorkoutSessionByIdAsync
         [Fact]
         public async Task GetWorkoutByIdAsync_ShouldReturnWorkoutSession_WhenWorkoutSessionExists()
         {
@@ -38,6 +41,49 @@ namespace WorkoutTrackerAPI.Tests
             Assert.Equal(10, result.WorkoutExercises[0].Sets[0].Reps);
         }
 
+        // Test for CreateWorkoutSessionAsync
+        [Fact]
+        public async Task CreateWorkoutSessionAsync_ShouldCreateWorkoutSession()
+        {
+            // Arrange
+            var userId = Guid.NewGuid().ToString();
+            var request = new CreateWorkoutSessionRequest
+            {
+                Name = "Workout Session 1",
+                StartedAt = DateTime.UtcNow,
+                EndedAt = DateTime.UtcNow.AddHours(1),
+                Notes = "Felt great!",
+                WorkoutExercises =
+                [
+                    new CreateWorkoutExerciseRequest
+                    {
+                        ExerciseId = Guid.NewGuid(),
+                        Sets =
+                        [
+                            new CreateExerciseSetRequest
+                            {
+                                Reps = 10,
+                                Weight = 100
+                            }
+                        ]
+                    }
+                ]
+            };
+
+            _workoutSessionRepository
+                .CreateWorkoutAsync(Arg.Any<WorkoutSession>())
+                .Returns(callInfo => callInfo.Arg<WorkoutSession>());
+
+            // Act
+            var result = await _sut.CreateWorkoutSessionAsync(request, userId);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("Workout Session 1", result.Name);
+            Assert.Equal("Felt great!", result.Notes);
+            Assert.Single(result.WorkoutExercises);
+            Assert.Equal(10, result.WorkoutExercises[0].Sets[0].Reps);
+        }
         private static WorkoutSession CreateStandardWorkoutEntity(Guid workoutSessionId, string userId)
             => new()
             {

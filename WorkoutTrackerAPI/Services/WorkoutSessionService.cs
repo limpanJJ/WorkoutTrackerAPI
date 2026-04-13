@@ -24,8 +24,37 @@ namespace WorkoutTrackerAPI.Services
             return MapToResponse(session);
         }
 
-        public Task<WorkoutSessionResponse> CreateWorkoutSessionAsync(CreateWorkoutSessionRequest request, string userId)
-            => throw new NotImplementedException();
+        public async Task<WorkoutSessionResponse> CreateWorkoutSessionAsync(CreateWorkoutSessionRequest request, string userId)
+        {
+            var session = new WorkoutSession
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                Name = request.Name,
+                StartedAt = request.StartedAt,
+                EndedAt = request.EndedAt,
+                Notes = request.Notes,
+                WorkoutExercises = request.WorkoutExercises.Select((we, index) => new WorkoutExercise
+                {
+                    Id = Guid.NewGuid(),
+                    ExerciseId = we.ExerciseId,
+                    Order = index + 1,
+                    Notes = we.Notes,
+                    WorkoutExerciseSets = we.Sets.Select((s, setIndex) => new WorkoutExerciseSet
+                    {
+                        Id = Guid.NewGuid(),
+                        SetNumber = setIndex + 1,
+                        Reps = s.Reps,
+                        Weight = s.Weight,
+                        DurationSeconds = s.DurationSeconds,
+                        DistanceMeters = s.DistanceMeters
+                    }).ToList()
+                }).ToList()
+            };
+
+            await repository.CreateWorkoutAsync(session);
+            return MapToResponse(session);
+        }
 
         public Task UpdateWorkoutAsync(Guid id, UpdateWorkoutSessionRequest request, string userId)
             => throw new NotImplementedException();

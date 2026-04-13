@@ -33,6 +33,8 @@ namespace WorkoutTrackerAPI.Repositories
             context.Exercises.Add(exercise);
             await context.SaveChangesAsync();
 
+            // Explicitly load navigation properties so the returned entity
+            // includes Category and MuscleGroup names for response mapping.
             await context.Entry(exercise).Reference(e => e.Category).LoadAsync();
             if (exercise.MuscleGroupId.HasValue)
             {
