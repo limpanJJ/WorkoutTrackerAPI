@@ -7,6 +7,6 @@ namespace WorkoutTrackerAPI.Dtos.Sessions.WorkoutExercises.Requests
         public Guid ExerciseId { get; set; }
         public int Order { get; set; }
         public string? Notes { get; set; }
-        public List<CreateExerciseSetRequest>? Sets { get; set; }
+        public List<CreateExerciseSetRequest> Sets { get; set; } = [];
     }
 }
