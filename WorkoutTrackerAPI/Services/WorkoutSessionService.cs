@@ -13,8 +13,11 @@ namespace WorkoutTrackerAPI.Services
     public class WorkoutSessionService(IWorkoutSessionRepository repository) : IWorkoutSessionService
     {
         // Workout Sessions
-        public Task<List<WorkoutSessionSummaryResponse>> GetAllWorkoutSessionsAsync(string userId)
-            => throw new NotImplementedException();
+        public async Task<List<WorkoutSessionSummaryResponse>> GetAllWorkoutSessionsAsync(string userId)
+        {
+            var sessions = await repository.GetAllWorkoutsAsync(userId);
+            return sessions.Select(MapToSummaryResponse).ToList();
+        }
 
         public async Task<WorkoutSessionResponse> GetWorkoutSessionByIdAsync(Guid id, string userId)
         {
