@@ -94,3 +94,86 @@ Content-Type: application/json
 
 ### Delete exercise (replace with real GUID)
 DELETE {{baseUrl}}/api/exercises/00000000-0000-0000-0000-000000000000
+
+
+### =====================
+### WORKOUT SESSIONS
+### =====================
+
+### Get all workout sessions
+GET {{baseUrl}}/api/workout-session
+
+### Get workout session by ID (replace with real GUID)
+GET {{baseUrl}}/api/workout-session/00000000-0000-0000-0000-000000000000
+
+### Create workout session
+POST {{baseUrl}}/api/workout-session
+Content-Type: application/json
+
+{
+  "name": "Morning Push Session",
+  "notes": "Focus on chest and triceps"
+}
+
+### Update workout session (replace with real GUID)
+PUT {{baseUrl}}/api/workout-session/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "name": "Updated Session Name",
+  "notes": "Changed focus to full body"
+}
+
+### Delete workout session (replace with real GUID)
+DELETE {{baseUrl}}/api/workout-session/00000000-0000-0000-0000-000000000000
+
+### =====================
+### WORKOUT EXERCISES
+### =====================
+
+### Add exercise to workout session (replace session GUID)
+POST {{baseUrl}}/api/workout-session/00000000-0000-0000-0000-000000000000/exercises
+Content-Type: application/json
+
+{
+  "exerciseId": "00000000-0000-0000-0000-000000000000",
+  "order": 1
+}
+
+### Update workout exercise (replace GUIDs)
+PUT {{baseUrl}}/api/workout-session/00000000-0000-0000-0000-000000000000/exercises/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "order": 2
+}
+
+### Delete workout exercise (replace GUIDs)
+DELETE {{baseUrl}}/api/workout-session/00000000-0000-0000-0000-000000000000/exercises/00000000-0000-0000-0000-000000000000
+
+### =====================
+### WORKOUT EXERCISE SETS
+### =====================
+
+### Add set to workout exercise (replace GUIDs)
+POST {{baseUrl}}/api/workout-session/00000000-0000-0000-0000-000000000000/exercises/00000000-0000-0000-0000-000000000000/sets
+Content-Type: application/json
+
+{
+  "setNumber": 1,
+  "reps": 10,
+  "weight": 80
+}
+
+### Update exercise set (replace GUIDs)
+PUT {{baseUrl}}/api/workout-session/00000000-0000-0000-0000-000000000000/exercises/00000000-0000-0000-0000-000000000000/sets/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "setNumber": 1,
+  "reps": 12,
+  "weight": 85
+}
+
+### Delete exercise set (replace GUIDs)
+DELETE {{baseUrl}}/api/workout-session/00000000-0000-0000-0000-000000000000/exercises/00000000-0000-0000-0000-000000000000/sets/00000000-0000-0000-0000-000000000000
