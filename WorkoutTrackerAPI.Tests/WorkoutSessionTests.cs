@@ -17,6 +17,104 @@ namespace WorkoutTrackerAPI.Tests
         {
             _sut = new WorkoutSessionService(_workoutSessionRepository);
         }
+
+        // Test for GetAllWorkoutsAsync
+        [Fact]
+        public async Task GetAllWorkoutSessionsAsync_ShouldReturnCorrectlyMappedSummaryResponses()
+        {
+            // Arrange
+            var userId = Guid.NewGuid().ToString();
+            var sessions = new List<WorkoutSession>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId,
+                    Name = "Push Day",
+                    StartedAt = DateTime.UtcNow,
+                    EndedAt = DateTime.UtcNow.AddHours(1),
+                    WorkoutExercises = new List<WorkoutExercise>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            ExerciseId = Guid.NewGuid(),
+                            WorkoutExerciseSets = new List<WorkoutExerciseSet>
+                            {
+                                new() { Id = Guid.NewGuid(), Reps = 10, Weight = 80 },
+                                new() { Id = Guid.NewGuid(), Reps = 8, Weight = 85 }
+                            }
+                        }
+                    }
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId,
+                    Name = "Leg Day",
+                    StartedAt = DateTime.UtcNow,
+                    EndedAt = null,
+                    WorkoutExercises = new List<WorkoutExercise>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            ExerciseId = Guid.NewGuid(),
+                            WorkoutExerciseSets = new List<WorkoutExerciseSet>
+                            {
+                                new() { Id = Guid.NewGuid(), Reps = 5, Weight = 120 }
+                            }
+                        },
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            ExerciseId = Guid.NewGuid(),
+                            WorkoutExerciseSets = new List<WorkoutExerciseSet>
+                            {
+                                new() { Id = Guid.NewGuid(), Reps = 12, Weight = 60 },
+                                new() { Id = Guid.NewGuid(), Reps = 10, Weight = 65 },
+                                new() { Id = Guid.NewGuid(), Reps = 8, Weight = 70 }
+                            }
+                        }
+                    }
+                }
+            };
+
+            _workoutSessionRepository
+                .GetAllWorkoutsAsync(userId)
+                .Returns(sessions);
+
+            // Act
+            var result = await _sut.GetAllWorkoutSessionsAsync(userId);
+
+            // Assert
+            Assert.Equal(2, result.Count);
+
+            Assert.Equal("Push Day", result[0].Name);
+            Assert.Equal(1, result[0].ExerciseCount);
+            Assert.Equal(2, result[0].TotalSets);
+
+            Assert.Equal("Leg Day", result[1].Name);
+            Assert.Null(result[1].EndedAt);
+            Assert.Equal(2, result[1].ExerciseCount);
+            Assert.Equal(4, result[1].TotalSets);
+        }
+
+        [Fact]
+        public async Task GetAllWorkoutSessionsAsync_ShouldReturnEmptyList_WhenNoWorkoutSessionsExist()
+        {
+            // Arrange
+            var userId = Guid.NewGuid().ToString();
+            _workoutSessionRepository
+                .GetAllWorkoutsAsync(userId)
+                .Returns(new List<WorkoutSession>());
+            // Act
+            var result = await _sut.GetAllWorkoutSessionsAsync(userId);
+            // Assert
+            Assert.NotNull(result);
+            Assert.Empty(result);
+        }
+
         // Test for GetWorkoutSessionByIdAsync
         [Fact]
         public async Task GetWorkoutByIdAsync_ShouldReturnWorkoutSession_WhenWorkoutSessionExists()
