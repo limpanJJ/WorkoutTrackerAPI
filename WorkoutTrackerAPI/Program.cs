@@ -79,6 +79,8 @@ builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
 builder.Services.AddScoped<IExerciseService, ExerciseService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IMuscleGroupService, MuscleGroupService>();
+builder.Services.AddScoped<IWorkoutSessionService, WorkoutSessionService>();
+builder.Services.AddScoped<IWorkoutSessionRepository, WorkoutSessionRepository>();
 
 var app = builder.Build();
 

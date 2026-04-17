@@ -21,9 +21,7 @@ namespace WorkoutTrackerAPI.Services
 
         public async Task<WorkoutSessionResponse> GetWorkoutSessionByIdAsync(Guid id, string userId)
         {
-            var session = await repository.GetWorkoutByIdAsync(id, userId)
-                ?? throw new NotFoundException($"Workout session with ID '{id}' not found.");
-
+            var session = await GetSessionOrThrowAsync(id, userId, tracked: false);
             return MapToResponse(session);
         }
 
@@ -59,31 +57,112 @@ namespace WorkoutTrackerAPI.Services
             return MapToResponse(session);
         }
 
-        public Task UpdateWorkoutAsync(Guid id, UpdateWorkoutSessionRequest request, string userId)
-            => throw new NotImplementedException();
+        public async Task UpdateWorkoutAsync(Guid id, UpdateWorkoutSessionRequest request, string userId)
+        {
+            var session = await GetSessionOrThrowAsync(id, userId);
 
-        public Task DeleteWorkoutSessionAsync(Guid id, string userId)
-            => throw new NotImplementedException();
+            session.Name = request.Name;
+            session.StartedAt = request.StartedAt;
+            session.EndedAt = request.EndedAt;
+            session.Notes = request.Notes;
+
+            await repository.SaveChangesAsync();
+        }
+
+        public async Task DeleteWorkoutSessionAsync(Guid id, string userId)
+        {
+            var session = await GetSessionOrThrowAsync(id, userId);
+            await repository.DeleteWorkoutAsync(session);
+        }
 
         // Workout Exercises
-        public Task AddExerciseToWorkoutAsync(Guid workoutSessionId, CreateWorkoutExerciseRequest request, string userId)
-            => throw new NotImplementedException();
+        public async Task AddExerciseToWorkoutAsync(Guid workoutSessionId, CreateWorkoutExerciseRequest request, string userId)
+        {
+            await GetSessionOrThrowAsync(workoutSessionId, userId);
 
-        public Task UpdateWorkoutExerciseAsync(Guid workoutSessionId, Guid exerciseId, UpdateWorkoutExerciseRequest request, string userId)
-            => throw new NotImplementedException();
+            var workoutExercise = new WorkoutExercise
+            {
+                ExerciseId = request.ExerciseId,
+                WorkoutSessionId = workoutSessionId,
+                Order = request.Order,
+                Notes = request.Notes,
+                WorkoutExerciseSets = request.Sets.Select((s, i) => new WorkoutExerciseSet
+                {
+                    SetNumber = i + 1,
+                    Reps = s.Reps,
+                    Weight = s.Weight,
+                    DurationSeconds = s.DurationSeconds,
+                    DistanceMeters = s.DistanceMeters
+                }).ToList()
+            };
 
-        public Task DeleteWorkoutExerciseAsync(Guid workoutSessionId, Guid exerciseId, string userId)
-            => throw new NotImplementedException();
+            await repository.AddWorkoutExerciseAsync(workoutExercise);
+        }
+
+        public async Task UpdateWorkoutExerciseAsync(Guid workoutSessionId, Guid exerciseId, UpdateWorkoutExerciseRequest request, string userId)
+        {
+            var session = await GetSessionOrThrowAsync(workoutSessionId, userId);
+            var workoutExercise = GetExerciseOrThrow(session, exerciseId);
+
+            workoutExercise.Order = request.Order;
+            workoutExercise.Notes = request.Notes;
+
+            await repository.SaveChangesAsync();
+        }
+
+        public async Task DeleteWorkoutExerciseAsync(Guid workoutSessionId, Guid exerciseId, string userId)
+        {
+            var session = await GetSessionOrThrowAsync(workoutSessionId, userId);
+            var workoutExercise = GetExerciseOrThrow(session, exerciseId);
+            await repository.DeleteWorkoutExerciseAsync(workoutExercise);
+        }
 
         // Exercise Sets
-        public Task AddExerciseSetAsync(Guid workoutSessionId, Guid exerciseId, CreateExerciseSetRequest request, string userId)
-            => throw new NotImplementedException();
+        public async Task AddExerciseSetAsync(Guid workoutSessionId, Guid exerciseId, CreateExerciseSetRequest request, string userId)
+        {
+            var session = await GetSessionOrThrowAsync(workoutSessionId, userId);
+            var workoutExercise = GetExerciseOrThrow(session, exerciseId);
 
-        public Task UpdateExerciseSetAsync(Guid workoutSessionId, Guid exerciseId, Guid setId, UpdateExerciseSetRequest request, string userId)
-            => throw new NotImplementedException();
+            var exerciseSet = new WorkoutExerciseSet
+            {
+                WorkoutExerciseId = exerciseId,
+                SetNumber = request.SetNumber,
+                Reps = request.Reps,
+                Weight = request.Weight,
+                DurationSeconds = request.DurationSeconds,
+                DistanceMeters = request.DistanceMeters
+            };
 
-        public Task DeleteExerciseSetAsync(Guid workoutSessionId, Guid exerciseId, Guid setId, string userId)
-            => throw new NotImplementedException();
+            await repository.AddExerciseSetAsync(exerciseSet);
+        }
+
+        public async Task UpdateExerciseSetAsync(Guid workoutSessionId, Guid exerciseId, Guid setId, UpdateExerciseSetRequest request, string userId)
+        {
+            var session = await GetSessionOrThrowAsync(workoutSessionId, userId);
+            var workoutExercise = GetExerciseOrThrow(session, exerciseId);
+
+            var exerciseSet = workoutExercise.WorkoutExerciseSets.FirstOrDefault(s => s.Id == setId)
+                ?? throw new NotFoundException($"Exercise set with ID '{setId}' not found in workout exercise '{exerciseId}'.");
+
+            exerciseSet.SetNumber = request.SetNumber;
+            exerciseSet.Reps = request.Reps;
+            exerciseSet.Weight = request.Weight;
+            exerciseSet.DurationSeconds = request.DurationSeconds;
+            exerciseSet.DistanceMeters = request.DistanceMeters;
+
+            await repository.SaveChangesAsync();
+        }
+
+        public async Task DeleteExerciseSetAsync(Guid workoutSessionId, Guid exerciseId, Guid setId, string userId)
+        {
+            var session = await GetSessionOrThrowAsync(workoutSessionId, userId);
+            var workoutExercise = GetExerciseOrThrow(session, exerciseId);
+
+            var exerciseSet = workoutExercise.WorkoutExerciseSets.FirstOrDefault(s => s.Id == setId)
+                ?? throw new NotFoundException($"Exercise set with ID '{setId}' not found in workout exercise '{exerciseId}'.");
+
+            await repository.DeleteExerciseSetAsync(exerciseSet);
+        }
 
         // Mapping helpers
         private static WorkoutSessionResponse MapToResponse(WorkoutSession session) => new()
@@ -123,5 +202,22 @@ namespace WorkoutTrackerAPI.Services
             ExerciseCount = session.WorkoutExercises.Count,
             TotalSets = session.WorkoutExercises.Sum(we => we.WorkoutExerciseSets.Count)
         };
+
+        private async Task<WorkoutSession> GetSessionOrThrowAsync(Guid workoutSessionId, string userId, bool tracked = true)
+        {
+            var session = await repository.GetWorkoutByIdAsync(workoutSessionId, userId, tracked)
+                ?? throw new NotFoundException($"Workout session with ID '{workoutSessionId}' not found.");
+
+            if (session.UserId != userId)
+                throw new UnauthorizedException("You do not have permission to modify this workout session.");
+
+            return session;
+        }
+
+        private static WorkoutExercise GetExerciseOrThrow(WorkoutSession session, Guid exerciseId)
+        {
+            return session.WorkoutExercises.FirstOrDefault(we => we.Id == exerciseId)
+                ?? throw new NotFoundException($"Workout exercise with ID '{exerciseId}' not found in session '{session.Id}'.");
+        }
     }
 }
