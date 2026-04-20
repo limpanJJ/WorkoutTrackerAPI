@@ -84,14 +84,15 @@ namespace WorkoutTrackerAPI.Tests
             };
 
             _workoutSessionRepository
-                .GetAllWorkoutsAsync(userId, page, pageSize)
+                .GetAllWorkoutsAsync(userId, Arg.Any<WorkoutSessionQueryParameters>())
                 .Returns(sessions);
 
             _workoutSessionRepository
-                .CountWorkoutsAsync(userId).Returns(2);
+                .CountWorkoutsAsync(userId, Arg.Any<WorkoutSessionQueryParameters>())
+                .Returns(2);
 
             // Act
-            var result = await _sut.GetAllWorkoutSessionsAsync(userId, page, pageSize);
+            var result = await _sut.GetAllWorkoutSessionsAsync(userId, new WorkoutSessionQueryParameters { Page = 1, PageSize = 10 });
             // Assert
 
             Assert.Equal("Push Day", result.Items[0].Name);
@@ -116,11 +117,11 @@ namespace WorkoutTrackerAPI.Tests
             // Arrange
             var userId = Guid.NewGuid().ToString();
             _workoutSessionRepository
-                .GetAllWorkoutsAsync(userId, Arg.Any<int>(), Arg.Any<int>())
+                .GetAllWorkoutsAsync(userId, Arg.Any<WorkoutSessionQueryParameters>())
                 .Returns(new List<WorkoutSession>());
 
             // Act
-            var result = await _sut.GetAllWorkoutSessionsAsync(userId, 1, 10);
+            var result = await _sut.GetAllWorkoutSessionsAsync(userId, new WorkoutSessionQueryParameters { Page = 1, PageSize = 10 });
 
             // Assert
             Assert.NotNull(result);

@@ -19,13 +19,9 @@ public class WorkoutSessionController(IWorkoutSessionService service) : Controll
     // === Workout Sessions ===
     [HttpGet]
     public async Task<ActionResult<PagedResponse<WorkoutSessionSummaryResponse>>> GetWorkoutSessions(
-    [FromQuery] int page = 1,
-    [FromQuery] int pageSize = 20)
-    => Ok(await service.GetAllWorkoutSessionsAsync(GetUserId(), page, pageSize));
+    [FromQuery] WorkoutSessionQueryParameters parameters)
+    => Ok(await service.GetAllWorkoutSessionsAsync(GetUserId(), parameters));
 
-    //[HttpGet]
-    //   public async Task<ActionResult<List<WorkoutSessionSummaryResponse>>> GetWorkoutSessions()
-    //       => Ok(await service.GetAllWorkoutSessionsAsync(GetUserId()));
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<WorkoutSessionResponse>> GetWorkoutSessionById(Guid id)

@@ -14,20 +14,20 @@ namespace WorkoutTrackerAPI.Services
     public class WorkoutSessionService(IWorkoutSessionRepository repository) : IWorkoutSessionService
     {
         // Workout Sessions
-        public async Task<PagedResponse<WorkoutSessionSummaryResponse>> GetAllWorkoutSessionsAsync(string userId, int page, int pageSize)
+        public async Task<PagedResponse<WorkoutSessionSummaryResponse>> GetAllWorkoutSessionsAsync(string userId, WorkoutSessionQueryParameters p)
         {
-            page = Math.Max(page, 1);
-            pageSize = Math.Clamp(pageSize, 1, 100);
+            p.Page = Math.Max(p.Page, 1);
+            p.PageSize = Math.Clamp(p.PageSize, 1, 100);
 
-            var totalCount = await repository.CountWorkoutsAsync(userId);
-            var sessions = await repository.GetAllWorkoutsAsync(userId, page, pageSize);
+            var totalCount = await repository.CountWorkoutsAsync(userId, p);
+            var sessions = await repository.GetAllWorkoutsAsync(userId, p);
 
             return new PagedResponse<WorkoutSessionSummaryResponse>
             {
                 Items = sessions.Select(MapToSummaryResponse).ToList(),
                 TotalCount = totalCount,
-                Page = page,
-                PageSize = pageSize
+                Page = p.Page,
+                PageSize = p.PageSize
             };
         }
 

@@ -9,7 +9,7 @@ namespace WorkoutTrackerAPI.Services
 {
     public interface IWorkoutSessionService
     {
-        Task<PagedResponse<WorkoutSessionSummaryResponse>> GetAllWorkoutSessionsAsync(string userId, int page, int pageSize);
+        Task<PagedResponse<WorkoutSessionSummaryResponse>> GetAllWorkoutSessionsAsync(string userId, WorkoutSessionQueryParameters parameters);
         Task<WorkoutSessionResponse> GetWorkoutSessionByIdAsync(Guid id, string userId);
         Task<WorkoutSessionResponse> CreateWorkoutSessionAsync(CreateWorkoutSessionRequest request, string userId);
         Task DeleteWorkoutSessionAsync(Guid id, string userId);
