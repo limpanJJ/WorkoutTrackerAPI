@@ -1,4 +1,5 @@
-﻿using WorkoutTrackerAPI.Dtos.Exercises.Requests;
+﻿using WorkoutTrackerAPI.Dtos.Common;
+using WorkoutTrackerAPI.Dtos.Exercises.Requests;
 using WorkoutTrackerAPI.Dtos.Exercises.Responses;
 using WorkoutTrackerAPI.Exceptions;
 using WorkoutTrackerAPI.Models;
@@ -8,10 +9,21 @@ namespace WorkoutTrackerAPI.Services
 {
     public class ExerciseService(IExerciseRepository repository) : IExerciseService
     {
-        public async Task<List<ExerciseResponse>> GetAllExercisesAsync(string userId)
+        public async Task<PagedResponse<ExerciseResponse>> GetAllExercisesAsync(string userId, int page, int pageSize)
         {
-            var exercises = await repository.GetAllExercisesAsync(userId);
-            return exercises.Select(MapToResponse).ToList();
+            page = Math.Max(page, 1);
+            pageSize = Math.Clamp(pageSize, 1, 100);
+
+            var totalCount = await repository.CountExercisesAsync(userId);
+            var exercises = await repository.GetAllExercisesAsync(userId, page, pageSize);
+
+            return new PagedResponse<ExerciseResponse>
+            {
+                Items = exercises.Select(MapToResponse).ToList(),
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
         }
 
         public async Task<ExerciseResponse> GetExerciseByIdAsync(Guid id, string userId)

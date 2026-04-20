@@ -1,11 +1,13 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WorkoutTrackerAPI.Services;
-using WorkoutTrackerAPI.Dtos.Sessions.Workouts.Requests;
-using WorkoutTrackerAPI.Dtos.Sessions.Workouts.Responses;
+using System.Security.Claims;
+using WorkoutTrackerAPI.Dtos.Common;
+using WorkoutTrackerAPI.Dtos.Exercises.Responses;
 using WorkoutTrackerAPI.Dtos.Sessions.WorkoutExercises.Requests;
 using WorkoutTrackerAPI.Dtos.Sessions.WorkoutExerciseSets.Requests;
+using WorkoutTrackerAPI.Dtos.Sessions.Workouts.Requests;
+using WorkoutTrackerAPI.Dtos.Sessions.Workouts.Responses;
+using WorkoutTrackerAPI.Services;
 
 namespace WorkoutTrackerAPI.Controllers;
 
@@ -15,10 +17,15 @@ namespace WorkoutTrackerAPI.Controllers;
 public class WorkoutSessionController(IWorkoutSessionService service) : ControllerBase
 {
     // === Workout Sessions ===
-
     [HttpGet]
-    public async Task<ActionResult<List<WorkoutSessionSummaryResponse>>> GetWorkoutSessions()
-        => Ok(await service.GetAllWorkoutSessionsAsync(GetUserId()));
+    public async Task<ActionResult<PagedResponse<WorkoutSessionSummaryResponse>>> GetWorkoutSessions(
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 20)
+    => Ok(await service.GetAllWorkoutSessionsAsync(GetUserId(), page, pageSize));
+
+    //[HttpGet]
+    //   public async Task<ActionResult<List<WorkoutSessionSummaryResponse>>> GetWorkoutSessions()
+    //       => Ok(await service.GetAllWorkoutSessionsAsync(GetUserId()));
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<WorkoutSessionResponse>> GetWorkoutSessionById(Guid id)

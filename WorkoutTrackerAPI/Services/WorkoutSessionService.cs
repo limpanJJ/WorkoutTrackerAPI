@@ -1,4 +1,5 @@
-﻿using WorkoutTrackerAPI.Dtos.Sessions.WorkoutExercises.Requests;
+﻿using WorkoutTrackerAPI.Dtos.Common;
+using WorkoutTrackerAPI.Dtos.Sessions.WorkoutExercises.Requests;
 using WorkoutTrackerAPI.Dtos.Sessions.WorkoutExercises.Responses;
 using WorkoutTrackerAPI.Dtos.Sessions.WorkoutExerciseSets.Requests;
 using WorkoutTrackerAPI.Dtos.Sessions.WorkoutExerciseSets.Responses;
@@ -13,10 +14,21 @@ namespace WorkoutTrackerAPI.Services
     public class WorkoutSessionService(IWorkoutSessionRepository repository) : IWorkoutSessionService
     {
         // Workout Sessions
-        public async Task<List<WorkoutSessionSummaryResponse>> GetAllWorkoutSessionsAsync(string userId)
+        public async Task<PagedResponse<WorkoutSessionSummaryResponse>> GetAllWorkoutSessionsAsync(string userId, int page, int pageSize)
         {
-            var sessions = await repository.GetAllWorkoutsAsync(userId);
-            return sessions.Select(MapToSummaryResponse).ToList();
+            page = Math.Max(page, 1);
+            pageSize = Math.Clamp(pageSize, 1, 100);
+
+            var totalCount = await repository.CountWorkoutsAsync(userId);
+            var sessions = await repository.GetAllWorkoutsAsync(userId, page, pageSize);
+
+            return new PagedResponse<WorkoutSessionSummaryResponse>
+            {
+                Items = sessions.Select(MapToSummaryResponse).ToList(),
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
         }
 
         public async Task<WorkoutSessionResponse> GetWorkoutSessionByIdAsync(Guid id, string userId)

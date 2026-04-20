@@ -7,14 +7,22 @@ namespace WorkoutTrackerAPI.Repositories
     public class WorkoutSessionRepository(AppDbContext context) : IWorkoutSessionRepository
     {
         // Workout Sessions
-        public async Task<List<WorkoutSession>> GetAllWorkoutsAsync(string userId)
+        public async Task<List<WorkoutSession>> GetAllWorkoutsAsync(string userId, int page, int pageSize)
             => await context.WorkoutSessions
                 .AsNoTracking()
                 .Include(ws => ws.WorkoutExercises)
                     .ThenInclude(we => we.WorkoutExerciseSets)
                 .Where(ws => ws.UserId == userId)
                 .OrderBy(ws => ws.StartedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+        public async Task<int> CountWorkoutsAsync(string userId)
+            => await context.WorkoutSessions
+                .AsNoTracking()
+                .Where(ws => ws.UserId == userId)
+                .CountAsync();
 
 
         public async Task<WorkoutSession?> GetWorkoutByIdAsync(Guid id, string userId, bool tracked = false)

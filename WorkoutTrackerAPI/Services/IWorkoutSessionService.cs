@@ -1,13 +1,15 @@
-﻿using WorkoutTrackerAPI.Dtos.Sessions.WorkoutExercises.Requests;
+﻿using WorkoutTrackerAPI.Dtos.Common;
+using WorkoutTrackerAPI.Dtos.Exercises.Responses;
+using WorkoutTrackerAPI.Dtos.Sessions.WorkoutExercises.Requests;
+using WorkoutTrackerAPI.Dtos.Sessions.WorkoutExerciseSets.Requests;
 using WorkoutTrackerAPI.Dtos.Sessions.Workouts.Requests;
 using WorkoutTrackerAPI.Dtos.Sessions.Workouts.Responses;
-using WorkoutTrackerAPI.Dtos.Sessions.WorkoutExerciseSets.Requests;
 
 namespace WorkoutTrackerAPI.Services
 {
     public interface IWorkoutSessionService
     {
-        Task<List<WorkoutSessionSummaryResponse>> GetAllWorkoutSessionsAsync(string userId);
+        Task<PagedResponse<WorkoutSessionSummaryResponse>> GetAllWorkoutSessionsAsync(string userId, int page, int pageSize);
         Task<WorkoutSessionResponse> GetWorkoutSessionByIdAsync(Guid id, string userId);
         Task<WorkoutSessionResponse> CreateWorkoutSessionAsync(CreateWorkoutSessionRequest request, string userId);
         Task DeleteWorkoutSessionAsync(Guid id, string userId);

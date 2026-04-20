@@ -20,6 +20,7 @@ namespace WorkoutTrackerAPI.Tests
         public async Task GetAllExercisesAsync_ShouldReturnCorrectlyMappedResponses()
         {
             // Arrange
+            int page = 1, pageSize = 10;
             var userId = Guid.NewGuid().ToString();
             var exercises = new List<Exercise>
             {
@@ -48,39 +49,45 @@ namespace WorkoutTrackerAPI.Tests
             };
 
             _exerciseRepository
-                .GetAllExercisesAsync(userId)
+                .GetAllExercisesAsync(userId, page, pageSize)
                 .Returns(exercises);
 
+            _exerciseRepository.CountExercisesAsync(userId).Returns(2);
+
             // Act
-            var result = await _sut.GetAllExercisesAsync(userId);
-
+            var result = await _sut.GetAllExercisesAsync(userId, page, pageSize);
             // Assert
-            Assert.Equal("Squat", result[0].Name);
-            Assert.Equal("Strength", result[0].CategoryName);
-            Assert.Equal("Legs", result[0].MuscleGroupName);
-            Assert.False(result[0].IsDefault);
+            Assert.Equal("Squat", result.Items[0].Name);
+            Assert.Equal("Strength", result.Items[0].CategoryName);
+            Assert.Equal("Legs", result.Items[0].MuscleGroupName);
+            Assert.False(result.Items[0].IsDefault);
 
-            Assert.Equal("Plank", result[1].Name);
-            Assert.Equal("Core", result[1].CategoryName);
-            Assert.Null(result[1].MuscleGroupName);
-            Assert.True(result[1].IsDefault);
+            Assert.Equal("Plank", result.Items[1].Name);
+            Assert.Equal("Core", result.Items[1].CategoryName);
+            Assert.Null(result.Items[1].MuscleGroupName);
+            Assert.True(result.Items[1].IsDefault);
+
+            Assert.Equal(2, result.TotalCount);
+            Assert.Equal(1, result.Page);
+            Assert.Equal(10, result.PageSize);
+            Assert.Equal(1, result.TotalPages);
         }
 
         [Fact]
         public async Task GetAllExercisesAsync_ShouldReturnEmptyList_WhenNoExercisesExist()
         {
             // Arrange
+            int page = 1, pageSize = 10;
             var userId = Guid.NewGuid().ToString();
 
             _exerciseRepository
-                .GetAllExercisesAsync(userId)
+                .GetAllExercisesAsync(userId, page, pageSize)
                 .Returns(new List<Exercise>());
 
             // Act
-            var result = await _sut.GetAllExercisesAsync(userId);
-
+            var result = await _sut.GetAllExercisesAsync(userId, page, pageSize);
             // Assert
-            Assert.Empty(result);
+            Assert.Empty(result.Items);
         }
 
         [Fact]

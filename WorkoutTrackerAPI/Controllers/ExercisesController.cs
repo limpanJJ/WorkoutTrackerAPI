@@ -1,9 +1,10 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WorkoutTrackerAPI.Services;
+using WorkoutTrackerAPI.Dtos.Common;
 using WorkoutTrackerAPI.Dtos.Exercises.Requests;
 using WorkoutTrackerAPI.Dtos.Exercises.Responses;
+using WorkoutTrackerAPI.Services;
 
 namespace WorkoutTrackerAPI.Controllers;
 
@@ -13,8 +14,10 @@ namespace WorkoutTrackerAPI.Controllers;
 public class ExercisesController(IExerciseService service) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<List<ExerciseResponse>>> GetExercises()
-        => Ok(await service.GetAllExercisesAsync(GetUserId()));
+    public async Task<ActionResult<PagedResponse<ExerciseResponse>>> GetExercises(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20)
+        => Ok(await service.GetAllExercisesAsync(GetUserId(), page, pageSize));
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<ExerciseResponse>> GetExerciseById(Guid id)

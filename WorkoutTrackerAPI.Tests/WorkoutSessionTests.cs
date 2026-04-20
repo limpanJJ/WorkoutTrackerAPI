@@ -26,6 +26,7 @@ namespace WorkoutTrackerAPI.Tests
         {
             // Arrange
             var userId = Guid.NewGuid().ToString();
+            int page = 1, pageSize = 10;
             var sessions = new List<WorkoutSession>
             {
                 new()
@@ -83,23 +84,30 @@ namespace WorkoutTrackerAPI.Tests
             };
 
             _workoutSessionRepository
-                .GetAllWorkoutsAsync(userId)
+                .GetAllWorkoutsAsync(userId, page, pageSize)
                 .Returns(sessions);
 
+            _workoutSessionRepository
+                .CountWorkoutsAsync(userId).Returns(2);
+
             // Act
-            var result = await _sut.GetAllWorkoutSessionsAsync(userId);
-
+            var result = await _sut.GetAllWorkoutSessionsAsync(userId, page, pageSize);
             // Assert
-            Assert.Equal(2, result.Count);
 
-            Assert.Equal("Push Day", result[0].Name);
-            Assert.Equal(1, result[0].ExerciseCount);
-            Assert.Equal(2, result[0].TotalSets);
+            Assert.Equal("Push Day", result.Items[0].Name);
+            Assert.Equal(1, result.Items[0].ExerciseCount);
+            Assert.Equal(2, result.Items[0].TotalSets);
 
-            Assert.Equal("Leg Day", result[1].Name);
-            Assert.Null(result[1].EndedAt);
-            Assert.Equal(2, result[1].ExerciseCount);
-            Assert.Equal(4, result[1].TotalSets);
+            Assert.Equal("Leg Day", result.Items[1].Name);
+            Assert.Null(result.Items[1].EndedAt);
+            Assert.Equal(2, result.Items[1].ExerciseCount);
+            Assert.Equal(4, result.Items[1].TotalSets);
+
+            // Paged response metadata
+            Assert.Equal(2, result.TotalCount);
+            Assert.Equal(1, result.Page);
+            Assert.Equal(10, result.PageSize);
+            Assert.Equal(1, result.TotalPages);
         }
 
         [Fact]
@@ -108,15 +116,15 @@ namespace WorkoutTrackerAPI.Tests
             // Arrange
             var userId = Guid.NewGuid().ToString();
             _workoutSessionRepository
-                .GetAllWorkoutsAsync(userId)
+                .GetAllWorkoutsAsync(userId, Arg.Any<int>(), Arg.Any<int>())
                 .Returns(new List<WorkoutSession>());
 
             // Act
-            var result = await _sut.GetAllWorkoutSessionsAsync(userId);
+            var result = await _sut.GetAllWorkoutSessionsAsync(userId, 1, 10);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Empty(result);
+            Assert.Empty(result.Items);
         }
 
         #endregion

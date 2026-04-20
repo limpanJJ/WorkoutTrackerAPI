@@ -5,7 +5,8 @@ namespace WorkoutTrackerAPI.Repositories
     public interface IWorkoutSessionRepository
     {
         // Workout Sessions
-        Task<List<WorkoutSession>> GetAllWorkoutsAsync(string userId);
+        Task<List<WorkoutSession>> GetAllWorkoutsAsync(string userId, int page, int pageSize);
+        Task<int> CountWorkoutsAsync(string userId);
         Task<WorkoutSession?> GetWorkoutByIdAsync(Guid id, string userId, bool tracked = false);
         Task<WorkoutSession> CreateWorkoutAsync(WorkoutSession workoutSession);
         Task DeleteWorkoutAsync(WorkoutSession workoutSession);
