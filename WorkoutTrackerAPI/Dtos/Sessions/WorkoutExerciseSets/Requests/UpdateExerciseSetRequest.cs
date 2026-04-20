@@ -1,11 +1,21 @@
-namespace WorkoutTrackerAPI.Dtos.Sessions.WorkoutExerciseSets.Requests
+using System.ComponentModel.DataAnnotations;
+
+namespace WorkoutTrackerAPI.Dtos.Sessions.WorkoutExerciseSets.Requests;
+
+public class UpdateExerciseSetRequest
 {
-    public class UpdateExerciseSetRequest
-    {
-        public int SetNumber { get; set; }
-        public int? Reps { get; set; }
-        public decimal? Weight { get; set; }
-        public int? DurationSeconds { get; set; }
-        public decimal? DistanceMeters { get; set; }
-    }
+    [Range(1, int.MaxValue)]
+    public int SetNumber { get; set; }
+
+    [Range(0, int.MaxValue)]
+    public int? Reps { get; set; }
+
+    [Range(0, double.MaxValue)]
+    public decimal? Weight { get; set; }
+
+    [Range(0, int.MaxValue)]
+    public int? DurationSeconds { get; set; }
+
+    [Range(0, double.MaxValue)]
+    public decimal? DistanceMeters { get; set; }
 }
