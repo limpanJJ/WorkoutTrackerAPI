@@ -7,7 +7,7 @@ namespace WorkoutTrackerAPI.Services
     public class WorkoutStatsService(AppDbContext context) : IWorkoutStatsService
     {
         public async Task<WorkoutStatsResponse> GetAllTimeStatsAsync(string userId)
-    => await GetStatsAsync(userId, DateTime.MinValue, DateTime.MaxValue);
+            => await GetStatsAsync(userId, DateTime.MinValue, DateTime.MaxValue);
 
         public async Task<WorkoutStatsResponse> GetYearlyStatsAsync(string userId, int year)
             => await GetStatsAsync(userId, new DateTime(year, 1, 1), new DateTime(year, 12, 31, 23, 59, 59));
