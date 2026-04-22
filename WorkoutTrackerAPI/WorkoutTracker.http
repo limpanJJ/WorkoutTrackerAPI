@@ -112,8 +112,11 @@ Content-Type: application/json
 
 {
   "name": "Morning Push Session",
+  "startedAt": "2025-03-01T08:00:00Z",
+  "endedAt": "2025-03-01T09:00:00Z",
   "notes": "Focus on chest and triceps"
 }
+
 
 ### Update workout session (replace with real GUID)
 PUT {{baseUrl}}/api/workout-session/00000000-0000-0000-0000-000000000000
