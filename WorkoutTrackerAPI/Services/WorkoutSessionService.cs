@@ -88,7 +88,7 @@ namespace WorkoutTrackerAPI.Services
         }
 
         // Workout Exercises
-        public async Task AddExerciseToWorkoutAsync(Guid workoutSessionId, CreateWorkoutExerciseRequest request, string userId)
+        public async Task<WorkoutExerciseResponse> AddExerciseToWorkoutAsync(Guid workoutSessionId, CreateWorkoutExerciseRequest request, string userId)
         {
             await GetSessionOrThrowAsync(workoutSessionId, userId);
 
@@ -109,6 +109,25 @@ namespace WorkoutTrackerAPI.Services
             };
 
             await repository.AddWorkoutExerciseAsync(workoutExercise);
+
+            return new WorkoutExerciseResponse
+            {
+                Id = workoutExercise.Id,
+                WorkoutSessionId = workoutExercise.WorkoutSessionId,
+                ExerciseId = workoutExercise.ExerciseId,
+                Order = workoutExercise.Order,
+                Notes = workoutExercise.Notes,
+                Sets = workoutExercise.WorkoutExerciseSets.Select(s => new ExerciseSetResponse
+                {
+                    Id = s.Id,
+                    WorkoutExerciseId = s.WorkoutExerciseId,
+                    SetNumber = s.SetNumber,
+                    Reps = s.Reps,
+                    Weight = s.Weight,
+                    DurationSeconds = s.DurationSeconds,
+                    DistanceMeters = s.DistanceMeters
+                }).ToList()
+            };
         }
 
         public async Task UpdateWorkoutExerciseAsync(Guid workoutSessionId, Guid exerciseId, UpdateWorkoutExerciseRequest request, string userId)
@@ -130,7 +149,7 @@ namespace WorkoutTrackerAPI.Services
         }
 
         // Exercise Sets
-        public async Task AddExerciseSetAsync(Guid workoutSessionId, Guid exerciseId, CreateExerciseSetRequest request, string userId)
+        public async Task<ExerciseSetResponse> AddExerciseSetAsync(Guid workoutSessionId, Guid exerciseId, CreateExerciseSetRequest request, string userId)
         {
             var session = await GetSessionOrThrowAsync(workoutSessionId, userId);
             var workoutExercise = GetExerciseOrThrow(session, exerciseId);
@@ -146,6 +165,17 @@ namespace WorkoutTrackerAPI.Services
             };
 
             await repository.AddExerciseSetAsync(exerciseSet);
+
+            return new ExerciseSetResponse
+            {
+                Id = exerciseSet.Id,
+                WorkoutExerciseId = exerciseSet.WorkoutExerciseId,
+                SetNumber = exerciseSet.SetNumber,
+                Reps = exerciseSet.Reps,
+                Weight = exerciseSet.Weight,
+                DurationSeconds = exerciseSet.DurationSeconds,
+                DistanceMeters = exerciseSet.DistanceMeters
+            };
         }
 
         public async Task UpdateExerciseSetAsync(Guid workoutSessionId, Guid exerciseId, Guid setId, UpdateExerciseSetRequest request, string userId)
